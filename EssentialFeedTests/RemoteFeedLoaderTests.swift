@@ -39,12 +39,12 @@ final class RemoteFeedLoaderTests: XCTestCase {
         let url = URL(string: "https://google.com")!
         let (client, sut) = makeSUT(url: url)
         
-        var capturedError: RemoteFeedLoader.Error?
-        sut.load { capturedError = $0 }
+        var capturedErrors: [RemoteFeedLoader.Error] = []
+        sut.load { capturedErrors.append($0) }
         client.complete(with: NSError(domain: "An error", code: 0))
         
         XCTAssertEqual(client.requestedURLs, [url])
-        XCTAssertEqual(capturedError, .connectivity)
+        XCTAssertEqual(capturedErrors, [.connectivity])
     }
     
     // MARK: - Helpers
