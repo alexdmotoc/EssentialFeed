@@ -38,7 +38,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     func test_load_onFailure_returnsErrorInCompletion() {
         let (client, sut) = makeSUT()
         
-        expect(sut: sut, completesWith: .connectivity, when: {
+        expect(sut: sut, completesWith: .failure(.connectivity), when: {
             client.complete(with: NSError(domain: "An error", code: 0))
         })
     }
@@ -48,9 +48,11 @@ final class RemoteFeedLoaderTests: XCTestCase {
         
         let statusCodes = [199, 201, 300, 400, 500]
         
+        let invalidJSON = Data("invalid json".utf8)
+        
         statusCodes.enumerated().forEach { index, code in
-            expect(sut: sut, completesWith: .invalidResponse, when: {
-                client.complete(with: code, at: index)
+            expect(sut: sut, completesWith: .failure(.invalidResponse), when: {
+                client.complete(with: code, data: invalidJSON, at: index)
             })
         }
     }
@@ -64,17 +66,17 @@ final class RemoteFeedLoaderTests: XCTestCase {
     
     func expect(
         sut: RemoteFeedLoader,
-        completesWith error: RemoteFeedLoader.Error,
+        completesWith result: RemoteFeedLoader.Result,
         when action: () -> Void,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        var capturedErrors: [RemoteFeedLoader.Error] = []
-        sut.load { capturedErrors.append($0) }
+        var capturedResults: [RemoteFeedLoader.Result] = []
+        sut.load { capturedResults.append($0) }
         
         action()
         
-        XCTAssertEqual(capturedErrors, [error], file: file, line: line)
+        XCTAssertEqual(capturedResults, [result], file: file, line: line)
     }
     
     private class HTTPClientSpy: HTTPClient {
@@ -92,14 +94,14 @@ final class RemoteFeedLoaderTests: XCTestCase {
             messages[index].completion(.failure(error))
         }
         
-        func complete(with status: Int, at index: Int = 0) {
+        func complete(with status: Int, data: Data, at index: Int = 0) {
             let response = HTTPURLResponse(
                 url: requestedURLs[index],
                 statusCode: status,
                 httpVersion: nil,
                 headerFields: nil
             )!
-            messages[index].completion(.success(response))
+            messages[index].completion(.success((response, data)))
         }
     }
 }
