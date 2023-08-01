@@ -11,6 +11,9 @@
 		87D5E7A12A78492E00D6142E /* EssentialFeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87D5E7962A78492D00D6142E /* EssentialFeed.framework */; };
 		87D5E7A62A78492E00D6142E /* RemoteFeedLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */; };
 		87D5E7A72A78492E00D6142E /* EssentialFeed.h in Headers */ = {isa = PBXBuildFile; fileRef = 87D5E7992A78492D00D6142E /* EssentialFeed.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		87D5E7B52A792A2E00D6142E /* RemoteFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B12A792A2600D6142E /* RemoteFeedLoader.swift */; };
+		87D5E7B62A792A3200D6142E /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B32A792A2800D6142E /* FeedLoader.swift */; };
+		87D5E7B72A792A3200D6142E /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B42A792A2800D6142E /* FeedItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +32,9 @@
 		87D5E79A2A78492D00D6142E /* EssentialFeed.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = EssentialFeed.docc; sourceTree = "<group>"; };
 		87D5E7A02A78492E00D6142E /* EssentialFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedLoaderTests.swift; sourceTree = "<group>"; };
+		87D5E7B12A792A2600D6142E /* RemoteFeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedLoader.swift; sourceTree = "<group>"; };
+		87D5E7B32A792A2800D6142E /* FeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoader.swift; sourceTree = "<group>"; };
+		87D5E7B42A792A2800D6142E /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +78,8 @@
 			isa = PBXGroup;
 			children = (
 				87D5E7992A78492D00D6142E /* EssentialFeed.h */,
+				87D5E7B02A792A2600D6142E /* Feed API */,
+				87D5E7B22A792A2800D6142E /* Feed feature */,
 				87D5E79A2A78492D00D6142E /* EssentialFeed.docc */,
 			);
 			path = EssentialFeed;
@@ -83,6 +91,23 @@
 				87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */,
 			);
 			path = EssentialFeedTests;
+			sourceTree = "<group>";
+		};
+		87D5E7B02A792A2600D6142E /* Feed API */ = {
+			isa = PBXGroup;
+			children = (
+				87D5E7B12A792A2600D6142E /* RemoteFeedLoader.swift */,
+			);
+			path = "Feed API";
+			sourceTree = "<group>";
+		};
+		87D5E7B22A792A2800D6142E /* Feed feature */ = {
+			isa = PBXGroup;
+			children = (
+				87D5E7B32A792A2800D6142E /* FeedLoader.swift */,
+				87D5E7B42A792A2800D6142E /* FeedItem.swift */,
+			);
+			path = "Feed feature";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -194,6 +219,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87D5E7B72A792A3200D6142E /* FeedItem.swift in Sources */,
+				87D5E7B62A792A3200D6142E /* FeedLoader.swift in Sources */,
+				87D5E7B52A792A2E00D6142E /* RemoteFeedLoader.swift in Sources */,
 				87D5E79B2A78492D00D6142E /* EssentialFeed.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -399,6 +427,7 @@
 		87D5E7AE2A78492E00D6142E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -413,6 +442,7 @@
 		87D5E7AF2A78492E00D6142E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
