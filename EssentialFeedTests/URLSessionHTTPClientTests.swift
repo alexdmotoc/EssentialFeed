@@ -70,6 +70,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         
         static func stopInterceptingRequests() {
             URLProtocol.unregisterClass(URLProtocolStub.self)
+            stubs = [:]
         }
         
         override class func canInit(with request: URLRequest) -> Bool {
