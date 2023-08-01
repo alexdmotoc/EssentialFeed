@@ -48,11 +48,13 @@ final class RemoteFeedLoaderTests: XCTestCase {
         
         let statusCodes = [199, 201, 300, 400, 500]
         
-        let invalidJSON = Data("invalid json".utf8)
+        let item1 = makeItem(id: UUID(), description: nil, location: nil, imageURL: URL(string: "https://a-url.com")!)
+        let item2 = makeItem(id: UUID(), description: "some desc", location: "some location", imageURL: URL(string: "https://a-url2.com")!)
+        let json = makeJSONData(from: [item1.json, item2.json])
         
         statusCodes.enumerated().forEach { index, code in
             expect(sut: sut, completesWith: .failure(.invalidResponse), when: {
-                client.complete(with: code, data: invalidJSON, at: index)
+                client.complete(with: code, data: json, at: index)
             })
         }
     }
@@ -82,7 +84,6 @@ final class RemoteFeedLoaderTests: XCTestCase {
         
         let item1 = makeItem(id: UUID(), description: nil, location: nil, imageURL: URL(string: "https://a-url.com")!)
         let item2 = makeItem(id: UUID(), description: "some desc", location: "some location", imageURL: URL(string: "https://a-url2.com")!)
-        
         let json = makeJSONData(from: [item1.json, item2.json])
         
         expect(sut: sut, completesWith: .success([item1.model, item2.model]), when: {
