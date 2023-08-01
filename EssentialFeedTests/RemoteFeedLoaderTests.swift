@@ -36,8 +36,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     }
     
     func test_load_onFailure_returnsErrorInCompletion() {
-        let url = URL(string: "https://google.com")!
-        let (client, sut) = makeSUT(url: url)
+        let (client, sut) = makeSUT()
         
         expect(sut: sut, completesWith: .connectivity, when: {
             client.complete(with: NSError(domain: "An error", code: 0))
@@ -45,8 +44,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     }
     
     func test_load_onNon200StatusCode_returnsErrorInCompletion() {
-        let url = URL(string: "https://google.com")!
-        let (client, sut) = makeSUT(url: url)
+        let (client, sut) = makeSUT()
         
         let statusCodes = [199, 201, 300, 400, 500]
         
