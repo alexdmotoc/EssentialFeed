@@ -67,13 +67,26 @@ final class RemoteFeedLoaderTests: XCTestCase {
         })
     }
     
-    func test_load_on200StatusCode_returnsEmptyArrayForEmptyJSONData() {
+    func test_load_on200StatusCode_returnsEmptyArrayForEmptyValidJSONData() {
         let (client, sut) = makeSUT()
         
         let emptyJSON = Data(#"{ "items": [] }"#.utf8)
         
         expect(sut: sut, completesWith: .success([]), when: {
             client.complete(with: 200, data: emptyJSON)
+        })
+    }
+    
+    func test_load_on200StatusCode_returnsArrayOfItemsForNonEmptyValidJSONData() {
+        let (client, sut) = makeSUT()
+        
+        let item1 = makeItem(id: UUID(), description: nil, location: nil, imageURL: URL(string: "https://a-url.com")!)
+        let item2 = makeItem(id: UUID(), description: "some desc", location: "some location", imageURL: URL(string: "https://a-url2.com")!)
+        
+        let json = makeJSONData(from: [item1.json, item2.json])
+        
+        expect(sut: sut, completesWith: .success([item1.model, item2.model]), when: {
+            client.complete(with: 200, data: json)
         })
     }
     
@@ -84,7 +97,29 @@ final class RemoteFeedLoaderTests: XCTestCase {
         return (client, RemoteFeedLoader(client: client, url: url))
     }
     
-    func expect(
+    private func makeJSONData(from items: [[String: String]]) -> Data {
+        try! JSONSerialization.data(withJSONObject: [
+            "items": items
+        ])
+    }
+    
+    private func makeItem(
+        id: UUID,
+        description: String?,
+        location: String?,
+        imageURL: URL
+    ) -> (model: FeedItem, json: [String: String]) {
+        let model = FeedItem(id: id, description: description, location: location, imageURL: imageURL)
+        let json = [
+            "id": id.uuidString,
+            "description": description,
+            "location": location,
+            "image": imageURL.absoluteString
+        ].compactMapValues { $0 }
+        return (model, json)
+    }
+    
+    private func expect(
         sut: RemoteFeedLoader,
         completesWith result: RemoteFeedLoader.Result,
         when action: () -> Void,
