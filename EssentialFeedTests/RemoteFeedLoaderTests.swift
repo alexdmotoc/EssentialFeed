@@ -9,7 +9,7 @@ import XCTest
 import EssentialFeed
 
 final class RemoteFeedLoaderTests: XCTestCase {
-
+    
     func test_init_doesNotRequestOnClient() {
         let (client, _) = makeSUT()
         
@@ -93,9 +93,28 @@ final class RemoteFeedLoaderTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func makeSUT(url: URL = URL(string: "https://a-site.com")!) -> (client: HTTPClientSpy, loader: RemoteFeedLoader) {
+    private func makeSUT(
+        url: URL = URL(string: "https://a-site.com")!,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> (client: HTTPClientSpy, loader: RemoteFeedLoader) {
         let client = HTTPClientSpy()
-        return (client, RemoteFeedLoader(client: client, url: url))
+        let sut = RemoteFeedLoader(client: client, url: url)
+        
+        checkIsDeallocated(sut: client, file: file, line: line)
+        checkIsDeallocated(sut: sut, file: file, line: line)
+        
+        return (client, sut)
+    }
+    
+    private func checkIsDeallocated(
+        sut: AnyObject,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        addTeardownBlock { [weak sut] in
+            XCTAssertNil(sut, file: file, line: line)
+        }
     }
     
     private func makeJSONData(from items: [[String: String]]) -> Data {
