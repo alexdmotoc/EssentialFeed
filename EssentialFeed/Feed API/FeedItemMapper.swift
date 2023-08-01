@@ -9,14 +9,18 @@ import Foundation
 
 enum FeedItemMapper {
     
-    static func map(response: HTTPURLResponse, data: Data) throws -> [FeedItem] {
-        guard response.statusCode == 200 else { throw RemoteFeedLoader.Error.invalidResponse }
-        let root = try JSONDecoder().decode(Root.self, from: data)
-        return root.items.map(\.item)
+    static func map(response: HTTPURLResponse, data: Data) -> RemoteFeedLoader.Result {
+        guard response.statusCode == 200, let root = try? JSONDecoder().decode(Root.self, from: data) else {
+            return .failure(.invalidResponse)
+        }
+        return .success(root.feed)
     }
     
     private struct Root: Decodable {
         let items: [APIFeedItem]
+        var feed: [FeedItem] {
+            items.map(\.item)
+        }
     }
 
     private struct APIFeedItem: Decodable {
