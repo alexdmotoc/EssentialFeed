@@ -18,7 +18,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     
     func test_load_callsGetWithTheSpecifiedURLOnClient() {
         let url = URL(string: "https://google.com")!
-        let (client, sut) = makeSUT()
+        let (client, sut) = makeSUT(url: url)
         
         sut.load()
         
@@ -27,7 +27,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     
     func test_loadTwice_callsGetWithTheSpecifiedURLOnClientTwice() {
         let url = URL(string: "https://google.com")!
-        let (client, sut) = makeSUT()
+        let (client, sut) = makeSUT(url: url)
         
         sut.load()
         sut.load()
@@ -37,7 +37,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func makeSUT(url: URL = URL(string: "https://google.com")!) -> (client: HTTPClientSpy, loader: RemoteFeedLoader) {
+    private func makeSUT(url: URL = URL(string: "https://a-site.com")!) -> (client: HTTPClientSpy, loader: RemoteFeedLoader) {
         let client = HTTPClientSpy()
         return (client, RemoteFeedLoader(client: client, url: url))
     }
