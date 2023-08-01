@@ -10,29 +10,41 @@ import EssentialFeed
 
 final class RemoteFeedLoaderTests: XCTestCase {
 
-    func test_init_doesNotCallGetOnClient() {
+    func test_init_doesNotRequestOnClient() {
         let (client, _) = makeSUT()
         
         XCTAssertTrue(client.requestedURLs.isEmpty)
     }
     
-    func test_load_callsGetWithTheSpecifiedURLOnClient() {
+    func test_load_requestsOnClient() {
         let url = URL(string: "https://google.com")!
         let (client, sut) = makeSUT(url: url)
         
-        sut.load()
+        sut.load { _ in }
         
         XCTAssertEqual(client.requestedURLs, [url])
     }
     
-    func test_loadTwice_callsGetWithTheSpecifiedURLOnClientTwice() {
+    func test_loadTwice_requestsOnClientTwice() {
         let url = URL(string: "https://google.com")!
         let (client, sut) = makeSUT(url: url)
         
-        sut.load()
-        sut.load()
+        sut.load { _ in }
+        sut.load { _ in }
         
         XCTAssertEqual(client.requestedURLs, [url, url])
+    }
+    
+    func test_load_onFailure_returnsErrorInCompletion() {
+        let url = URL(string: "https://google.com")!
+        let (client, sut) = makeSUT(url: url)
+        
+        var capturedError: RemoteFeedLoader.Error?
+        sut.load { capturedError = $0 }
+        client.complete(with: NSError(domain: "An error", code: 0))
+        
+        XCTAssertEqual(client.requestedURLs, [url])
+        XCTAssertEqual(capturedError, .connectivity)
     }
     
     // MARK: - Helpers
@@ -43,10 +55,18 @@ final class RemoteFeedLoaderTests: XCTestCase {
     }
     
     private class HTTPClientSpy: HTTPClient {
-        var requestedURLs: [URL] = []
+        var messages: [(url: URL, completion: (Error) -> Void)] = []
         
-        func get(url: URL) {
-            requestedURLs.append(url)
+        var requestedURLs: [URL] {
+            messages.map { $0.url }
+        }
+        
+        func get(url: URL, completion: @escaping (Error) -> Void) {
+            messages.append((url, completion))
+        }
+        
+        func complete(with error: Error, at index: Int = 0) {
+            messages[index].completion(error)
         }
     }
 }
