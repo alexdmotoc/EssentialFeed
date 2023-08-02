@@ -150,23 +150,16 @@ class URLSessionHTTPClientTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> Error? {
-        URLProtocolStub.stub(data: data, response: response, error: error)
         
-        let exp = expectation(description: "wait for request to complete")
-        var encounteredError: Error?
-        makeSUT(file: file, line: line).get(url: makeURL()) { result in
-            switch result {
-            case .failure(let error):
-                encounteredError = error
-            case .success:
-                break
-            }
-            exp.fulfill()
+        guard let result = getResult(from: data, response: response, error: error, file: file, line: line) else {
+            return nil
         }
-        
-        wait(for: [exp], timeout: 1)
-        
-        return encounteredError
+        switch result {
+        case .success:
+            return nil
+        case .failure(let error):
+            return error
+        }
     }
     
     private func getResultingValues(
@@ -176,23 +169,38 @@ class URLSessionHTTPClientTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> (response: HTTPURLResponse, data: Data)? {
+        
+        guard let result = getResult(from: data, response: response, error: error, file: file, line: line) else {
+            return nil
+        }
+        switch result {
+        case .success(let data):
+            return data
+        case .failure:
+            return nil
+        }
+    }
+    
+    private func getResult(
+        from data: Data?,
+        response: URLResponse?,
+        error: Error?,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> HTTPClient.Result? {
+        
         URLProtocolStub.stub(data: data, response: response, error: error)
         
         let exp = expectation(description: "wait for request to complete")
-        var encounteredValues: (response: HTTPURLResponse, data: Data)?
+        var encounteredResult: HTTPClient.Result?
         makeSUT(file: file, line: line).get(url: makeURL()) { result in
-            switch result {
-            case .success(let result):
-                encounteredValues = result
-            case .failure:
-                break
-            }
+            encounteredResult = result
             exp.fulfill()
         }
         
         wait(for: [exp], timeout: 1)
         
-        return encounteredValues
+        return encounteredResult
     }
     
     private class URLProtocolStub: URLProtocol {
