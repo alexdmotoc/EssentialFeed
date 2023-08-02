@@ -95,7 +95,7 @@ class URLSessionHTTPClientTests: XCTestCase {
     private func makeSUT(
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> URLSessionHTTPClient {
+    ) -> HTTPClient {
         let sut = URLSessionHTTPClient()
         checkIsDeallocated(sut: sut, file: file, line: line)
         return sut
