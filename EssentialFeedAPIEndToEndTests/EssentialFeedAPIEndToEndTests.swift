@@ -31,10 +31,12 @@ final class EssentialFeedAPIEndToEndTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func getResult() -> RemoteFeedLoader.Result? {
+    private func getResult(file: StaticString = #filePath, line: UInt = #line) -> RemoteFeedLoader.Result? {
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let client = URLSessionHTTPClient()
         let service = RemoteFeedLoader(client: client, url: testServerURL)
+        checkIsDeallocated(sut: client, file: file, line: line)
+        checkIsDeallocated(sut: service, file: file, line: line)
         
         var receivedResult: RemoteFeedLoader.Result?
         let exp = expectation(description: "wait for request to complete")
