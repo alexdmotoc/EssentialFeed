@@ -125,16 +125,6 @@ final class RemoteFeedLoaderTests: XCTestCase {
         .failure(error)
     }
     
-    private func checkIsDeallocated(
-        sut: AnyObject,
-        file: StaticString = #filePath,
-        line: UInt = #line
-    ) {
-        addTeardownBlock { [weak sut] in
-            XCTAssertNil(sut, file: file, line: line)
-        }
-    }
-    
     private func makeJSONData(from items: [[String: String]]) -> Data {
         try! JSONSerialization.data(withJSONObject: [
             "items": items
