@@ -78,6 +78,15 @@ class URLSessionHTTPClientTests: XCTestCase {
     
     func test_getURL_failsWhenInvalidCaseIsEncountered() {
         XCTAssertNotNil(getResultingError(from: nil, response: nil, error: nil))
+        XCTAssertNotNil(getResultingError(from: nil, response: makeURLResponse(), error: nil))
+        XCTAssertNotNil(getResultingError(from: nil, response: makeHTTPURLResponse(), error: nil))
+        XCTAssertNotNil(getResultingError(from: makeData(), response: nil, error: nil))
+        XCTAssertNotNil(getResultingError(from: makeData(), response: nil, error: makeNSError()))
+        XCTAssertNotNil(getResultingError(from: nil, response: makeURLResponse(), error: makeNSError()))
+        XCTAssertNotNil(getResultingError(from: nil, response: makeHTTPURLResponse(), error: makeNSError()))
+        XCTAssertNotNil(getResultingError(from: makeData(), response: makeURLResponse(), error: makeNSError()))
+        XCTAssertNotNil(getResultingError(from: makeData(), response: makeHTTPURLResponse(), error: makeNSError()))
+        XCTAssertNotNil(getResultingError(from: makeData(), response: makeURLResponse(), error: nil))
     }
     
     // MARK: - Helpers
@@ -86,6 +95,10 @@ class URLSessionHTTPClientTests: XCTestCase {
         let sut = URLSessionHTTPClient()
         checkIsDeallocated(sut: sut)
         return sut
+    }
+    
+    private func makeData() -> Data {
+        .init("some data".utf8)
     }
     
     private func makeURL() -> URL {
