@@ -22,22 +22,12 @@ class URLSessionHTTPClientTests: XCTestCase {
     
     func test_getURL_returnsErrorWhenEncountered() {
         
-        let sut = makeSUT()
         let error = makeNSError()
-        URLProtocolStub.stub(data: nil, response: nil, error: error)
         
-        let exp = expectation(description: "wait for request to complete")
-        sut.get(url: makeURL()) { result in
-            switch result {
-            case .failure(let encounteredError as NSError):
-                XCTAssertEqual(error.domain, encounteredError.domain)
-                XCTAssertEqual(error.code, encounteredError.code)
-            default:
-                XCTFail("expected to fail with error \(error), got \(result)")
-            }
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 1)
+        let encounteredError = getResultingError(from: nil, response: nil, error: error) as? NSError
+        
+        XCTAssertEqual(error.domain, encounteredError?.domain)
+        XCTAssertEqual(error.code, encounteredError?.code)
     }
     
     func test_getURL_executesTheAppropriateURLRequest() {
