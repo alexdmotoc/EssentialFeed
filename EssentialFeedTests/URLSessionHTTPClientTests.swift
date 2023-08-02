@@ -15,10 +15,14 @@ class URLSessionHTTPClient {
         self.session = session
     }
     
+    struct LoadError: Error {}
+    
     func get(url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
         session.dataTask(with: url) { _, _, error in
             if let error = error {
                 completion(.failure(error))
+            } else {
+                completion(.failure(LoadError()))
             }
         }.resume()
     }
@@ -38,13 +42,12 @@ class URLSessionHTTPClientTests: XCTestCase {
     
     func test_getURL_returnsErrorWhenEncountered() {
         
-        let url = makeURL()
         let sut = makeSUT()
         let error = makeNSError()
         URLProtocolStub.stub(data: nil, response: nil, error: error)
         
         let exp = expectation(description: "wait for request to complete")
-        sut.get(url: url) { result in
+        sut.get(url: makeURL()) { result in
             switch result {
             case .failure(let encounteredError as NSError):
                 XCTAssertEqual(error.domain, encounteredError.domain)
@@ -73,6 +76,10 @@ class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
+    func test_getURL_failsWhenInvalidCaseIsEncountered() {
+        XCTAssertNotNil(getResultingError(from: nil, response: nil, error: nil))
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT() -> URLSessionHTTPClient {
@@ -82,11 +89,39 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     private func makeURL() -> URL {
-        URL(string: "https://some-url.com")!
+        .init(string: "https://some-url.com")!
     }
     
     private func makeNSError() -> NSError {
-        NSError(domain: "an error", code: 0)
+        .init(domain: "an error", code: 0)
+    }
+    
+    private func makeURLResponse() -> URLResponse {
+        .init(url: URL(string: "https://someurl.com")!, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
+    }
+    
+    private func makeHTTPURLResponse() -> HTTPURLResponse {
+        .init(url: URL(string: "https://someurl.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    }
+    
+    func getResultingError(from data: Data?, response: URLResponse?, error: Error?) -> Error? {
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        
+        let exp = expectation(description: "wait for request to complete")
+        var encounteredError: Error?
+        makeSUT().get(url: makeURL()) { result in
+            switch result {
+            case .failure(let error):
+                encounteredError = error
+            case .success:
+                break
+            }
+            exp.fulfill()
+        }
+        
+        wait(for: [exp], timeout: 1)
+        
+        return encounteredError
     }
     
     private class URLProtocolStub: URLProtocol {
