@@ -38,9 +38,9 @@ class URLSessionHTTPClientTests: XCTestCase {
     
     func test_getURL_returnsErrorWhenEncountered() {
         
-        let url = URL(string: "https://some-url.com")!
-        let sut = URLSessionHTTPClient()
-        let error = NSError(domain: "an error", code: 0)
+        let url = makeURL()
+        let sut = makeSUT()
+        let error = makeNSError()
         URLProtocolStub.stub(data: nil, response: nil, error: error)
         
         let exp = expectation(description: "wait for request to complete")
@@ -59,10 +59,8 @@ class URLSessionHTTPClientTests: XCTestCase {
     
     func test_getURL_executesTheAppropriateURLRequest() {
         
-        let url = URL(string: "https://some-url.com")!
-        let sut = URLSessionHTTPClient()
-        let error = NSError(domain: "an error", code: 0)
-        URLProtocolStub.stub(data: nil, response: nil, error: error)
+        let url = makeURL()
+        let sut = makeSUT()
         
         let exp = expectation(description: "wait for request to complete")
         URLProtocolStub.observeRequests { request in
@@ -76,6 +74,20 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     // MARK: - Helpers
+    
+    private func makeSUT() -> URLSessionHTTPClient {
+        let sut = URLSessionHTTPClient()
+        checkIsDeallocated(sut: sut)
+        return sut
+    }
+    
+    private func makeURL() -> URL {
+        URL(string: "https://some-url.com")!
+    }
+    
+    private func makeNSError() -> NSError {
+        NSError(domain: "an error", code: 0)
+    }
     
     private class URLProtocolStub: URLProtocol {
         var requestedURLs: [URL] = []
