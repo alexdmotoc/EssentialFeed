@@ -18,9 +18,11 @@ class URLSessionHTTPClient {
     struct LoadError: Error {}
     
     func get(url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
-        session.dataTask(with: url) { _, _, error in
+        session.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
+            } else if let data, !data.isEmpty, let response = response as? HTTPURLResponse {
+                completion(.success((response, data)))
             } else {
                 completion(.failure(LoadError()))
             }
@@ -89,11 +91,35 @@ class URLSessionHTTPClientTests: XCTestCase {
         XCTAssertNotNil(getResultingError(from: makeData(), response: makeURLResponse(), error: nil))
     }
     
+    func test_getURL_retrievesDataAndHTTPURLResponse() {
+        let data = makeData()
+        let response = makeHTTPURLResponse()
+        URLProtocolStub.stub(data: data, response: response, error: nil)
+        
+        let exp = expectation(description: "wait for request to complete")
+        makeSUT().get(url: makeURL()) { result in
+            switch result {
+            case .success(let result):
+                XCTAssertEqual(result.data, data)
+                XCTAssertEqual(result.response.url, response.url)
+                XCTAssertEqual(result.response.statusCode, response.statusCode)
+            case .failure(let error):
+                XCTFail("expected to succeed but failed with \(error)")
+            }
+            exp.fulfill()
+        }
+        
+        wait(for: [exp], timeout: 1)
+    }
+    
     // MARK: - Helpers
     
-    private func makeSUT() -> URLSessionHTTPClient {
+    private func makeSUT(
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> URLSessionHTTPClient {
         let sut = URLSessionHTTPClient()
-        checkIsDeallocated(sut: sut)
+        checkIsDeallocated(sut: sut, file: file, line: line)
         return sut
     }
     
@@ -117,12 +143,18 @@ class URLSessionHTTPClientTests: XCTestCase {
         .init(url: URL(string: "https://someurl.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)!
     }
     
-    func getResultingError(from data: Data?, response: URLResponse?, error: Error?) -> Error? {
+    func getResultingError(
+        from data: Data?,
+        response: URLResponse?,
+        error: Error?,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> Error? {
         URLProtocolStub.stub(data: data, response: response, error: error)
         
         let exp = expectation(description: "wait for request to complete")
         var encounteredError: Error?
-        makeSUT().get(url: makeURL()) { result in
+        makeSUT(file: file, line: line).get(url: makeURL()) { result in
             switch result {
             case .failure(let error):
                 encounteredError = error
