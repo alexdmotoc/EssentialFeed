@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22222" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="FeedCacheMO" representedClassName="FeedCacheMO" syncable="YES" codeGenerationType="class">
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="feed" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="FeedItemMO" inverseName="cache" inverseEntity="FeedItemMO"/>
+    </entity>
+    <entity name="FeedItemMO" representedClassName="FeedItemMO" syncable="YES" codeGenerationType="class">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imageURL" attributeType="URI"/>
+        <attribute name="itemDescription" optional="YES" attributeType="String"/>
+        <attribute name="location" optional="YES" attributeType="String"/>
+        <relationship name="cache" maxCount="1" deletionRule="Nullify" destinationEntity="FeedCacheMO" inverseName="feed" inverseEntity="FeedCacheMO"/>
+    </entity>
+</model>
