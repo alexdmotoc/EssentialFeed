@@ -11,11 +11,14 @@
 		875D1FDD2A7A76C000B9210B /* URLSessionHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FDC2A7A76C000B9210B /* URLSessionHTTPClient.swift */; };
 		875D1FE52A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FE42A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.swift */; };
 		875D1FE62A7A7CD100B9210B /* EssentialFeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87D5E7962A78492D00D6142E /* EssentialFeed.framework */; };
+		878233A92AD40F34004B1FC6 /* LocalFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878233A82AD40F34004B1FC6 /* LocalFeedLoader.swift */; };
+		878233AB2AD41DCA004B1FC6 /* LocalFeedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878233AA2AD41DCA004B1FC6 /* LocalFeedImage.swift */; };
+		878233AD2AD41DE3004B1FC6 /* FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878233AC2AD41DE3004B1FC6 /* FeedStore.swift */; };
+		878233AF2AD41EAA004B1FC6 /* FeedCachePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878233AE2AD41EAA004B1FC6 /* FeedCachePolicy.swift */; };
 		87825ED12A7A90C700A98F36 /* XCTestCase+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FDA2A7A625E00B9210B /* XCTestCase+Utils.swift */; };
 		87D5E79B2A78492D00D6142E /* EssentialFeed.docc in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E79A2A78492D00D6142E /* EssentialFeed.docc */; };
 		87D5E7A12A78492E00D6142E /* EssentialFeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87D5E7962A78492D00D6142E /* EssentialFeed.framework */; };
 		87D5E7A62A78492E00D6142E /* RemoteFeedLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */; };
-		87D5E7A72A78492E00D6142E /* EssentialFeed.h in Headers */ = {isa = PBXBuildFile; fileRef = 87D5E7992A78492D00D6142E /* EssentialFeed.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		87D5E7B52A792A2E00D6142E /* RemoteFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B12A792A2600D6142E /* RemoteFeedLoader.swift */; };
 		87D5E7B62A792A3200D6142E /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B32A792A2800D6142E /* FeedLoader.swift */; };
 		87D5E7B72A792A3200D6142E /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7B42A792A2800D6142E /* FeedItem.swift */; };
@@ -46,9 +49,12 @@
 		875D1FDC2A7A76C000B9210B /* URLSessionHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClient.swift; sourceTree = "<group>"; };
 		875D1FE22A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedAPIEndToEndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		875D1FE42A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EssentialFeedAPIEndToEndTests.swift; sourceTree = "<group>"; };
+		878233A82AD40F34004B1FC6 /* LocalFeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFeedLoader.swift; sourceTree = "<group>"; };
+		878233AA2AD41DCA004B1FC6 /* LocalFeedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFeedImage.swift; sourceTree = "<group>"; };
+		878233AC2AD41DE3004B1FC6 /* FeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStore.swift; sourceTree = "<group>"; };
+		878233AE2AD41EAA004B1FC6 /* FeedCachePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCachePolicy.swift; sourceTree = "<group>"; };
 		87825ED02A7A905F00A98F36 /* CI.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = CI.xctestplan; sourceTree = "<group>"; };
 		87D5E7962A78492D00D6142E /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		87D5E7992A78492D00D6142E /* EssentialFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EssentialFeed.h; sourceTree = "<group>"; };
 		87D5E79A2A78492D00D6142E /* EssentialFeed.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = EssentialFeed.docc; sourceTree = "<group>"; };
 		87D5E7A02A78492E00D6142E /* EssentialFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedLoaderTests.swift; sourceTree = "<group>"; };
@@ -103,6 +109,17 @@
 			path = EssentialFeedAPIEndToEndTests;
 			sourceTree = "<group>";
 		};
+		878233A72AD40F12004B1FC6 /* Feed cache */ = {
+			isa = PBXGroup;
+			children = (
+				878233A82AD40F34004B1FC6 /* LocalFeedLoader.swift */,
+				878233AA2AD41DCA004B1FC6 /* LocalFeedImage.swift */,
+				878233AC2AD41DE3004B1FC6 /* FeedStore.swift */,
+				878233AE2AD41EAA004B1FC6 /* FeedCachePolicy.swift */,
+			);
+			path = "Feed cache";
+			sourceTree = "<group>";
+		};
 		87D5E78C2A78492D00D6142E = {
 			isa = PBXGroup;
 			children = (
@@ -127,7 +144,7 @@
 		87D5E7982A78492D00D6142E /* EssentialFeed */ = {
 			isa = PBXGroup;
 			children = (
-				87D5E7992A78492D00D6142E /* EssentialFeed.h */,
+				878233A72AD40F12004B1FC6 /* Feed cache */,
 				87D5E7B02A792A2600D6142E /* Feed API */,
 				87D5E7B22A792A2800D6142E /* Feed feature */,
 				87D5E79A2A78492D00D6142E /* EssentialFeed.docc */,
@@ -172,7 +189,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				87D5E7A72A78492E00D6142E /* EssentialFeed.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,7 +257,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					875D1FE12A7A7CD100B9210B = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -314,10 +330,14 @@
 			files = (
 				875D1FDD2A7A76C000B9210B /* URLSessionHTTPClient.swift in Sources */,
 				87D5E7B72A792A3200D6142E /* FeedItem.swift in Sources */,
+				878233AB2AD41DCA004B1FC6 /* LocalFeedImage.swift in Sources */,
+				878233AF2AD41EAA004B1FC6 /* FeedCachePolicy.swift in Sources */,
 				87D5E7B92A7966C000D6142E /* HTTPClient.swift in Sources */,
 				87D5E7B62A792A3200D6142E /* FeedLoader.swift in Sources */,
+				878233AD2AD41DE3004B1FC6 /* FeedStore.swift in Sources */,
 				87D5E7BB2A79676600D6142E /* FeedItemMapper.swift in Sources */,
 				87D5E7B52A792A2E00D6142E /* RemoteFeedLoader.swift in Sources */,
+				878233A92AD40F34004B1FC6 /* LocalFeedLoader.swift in Sources */,
 				87D5E79B2A78492D00D6142E /* EssentialFeed.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,6 +373,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexmotoc.EssentialFeedAPIEndToEndTests;
@@ -367,6 +388,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexmotoc.EssentialFeedAPIEndToEndTests;
@@ -410,9 +432,11 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -473,9 +497,11 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -501,6 +527,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -531,6 +558,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -561,6 +589,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexmotoc.EssentialFeedTests;
@@ -576,6 +605,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexmotoc.EssentialFeedTests;
