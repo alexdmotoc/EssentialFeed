@@ -31,11 +31,11 @@ public class LocalFeedLoader {
         store.retrieve { [weak self] result in
             guard let self else { return }
             switch result {
-            case .empty:
+            case .success(.none):
                 completion(.success([]))
-            case .found((let feed, let timestamp)) where FeedCachePolicy.validate(timestamp, against: currentDate()):
+            case .success(.some((let feed, let timestamp))) where FeedCachePolicy.validate(timestamp, against: currentDate()):
                 completion(.success(feed.toModels()))
-            case .found:
+            case .success:
                 completion(.success([]))
             case .failure(let error):
                 completion(.failure(error))
@@ -47,9 +47,9 @@ public class LocalFeedLoader {
         store.retrieve { [weak self] result in
             guard let self else { return }
             switch result {
-            case .found((_, let timestamp)) where !FeedCachePolicy.validate(timestamp, against: currentDate()):
+            case .success(.some((_, let timestamp))) where !FeedCachePolicy.validate(timestamp, against: currentDate()):
                 self.store.deleteCachedFeed { _ in }
-            case .empty, .found, .failure:
+            case .success, .failure:
                 break
             }
         }

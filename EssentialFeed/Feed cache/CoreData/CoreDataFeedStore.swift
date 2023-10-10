@@ -62,9 +62,9 @@ public final class CoreDataFeedStore: FeedStore {
             let request = FeedCacheMO.fetchRequest()
             do {
                 if let cache = try context.fetch(request).first {
-                    completion(.found((cache.localFeed, cache.timestamp!)))
+                    completion(.success((cache.localFeed, cache.timestamp!)))
                 } else {
-                    completion(.empty)
+                    completion(.success(.none))
                 }
             } catch {
                 completion(.failure(error))
