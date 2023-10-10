@@ -59,16 +59,11 @@ public final class CoreDataFeedStore: FeedStore {
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
         perform { context in
-            let request = FeedCacheMO.fetchRequest()
-            do {
-                if let cache = try context.fetch(request).first {
-                    completion(.success((cache.localFeed, cache.timestamp!)))
-                } else {
-                    completion(.success(.none))
+            completion(Result {
+                try context.fetch(FeedCacheMO.fetchRequest()).first.map {
+                    ($0.localFeed, $0.timestamp!)
                 }
-            } catch {
-                completion(.failure(error))
-            }
+            })
         }
     }
     
