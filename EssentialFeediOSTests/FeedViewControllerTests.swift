@@ -11,6 +11,8 @@ import EssentialFeed
 class FeedViewController: UITableViewController {
     private var loader: FeedLoader?
     
+    private var onViewIsAppearing: ((FeedViewController) -> Void)?
+    
     convenience init(loader: FeedLoader) {
         self.init()
         self.loader = loader
@@ -21,10 +23,20 @@ class FeedViewController: UITableViewController {
         
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(self.loadFeed), for: .valueChanged)
-        loadFeed()
+        
+        onViewIsAppearing = { vc in
+            vc.loadFeed()
+            vc.onViewIsAppearing = nil
+        }
+    }
+    
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        onViewIsAppearing?(self)
     }
     
     @objc private func loadFeed() {
+        refreshControl?.beginRefreshing()
         loader?.load { _ in }
     }
 }
@@ -40,7 +52,7 @@ final class FeedViewControllerTests: XCTestCase {
     func test_loadView_loadsTheFeed() {
         let (sut, loader) = makeSUT()
         
-        sut.loadViewIfNeeded()
+        sut.simulateAppearance()
         
         XCTAssertEqual(loader.loadCount, 1)
     }
@@ -48,10 +60,18 @@ final class FeedViewControllerTests: XCTestCase {
     func test_manualFeedReload_requestsLoadFromLoader() {
         let (sut, loader) = makeSUT()
         
-        sut.loadViewIfNeeded()
+        sut.simulateAppearance()
         sut.simulateManualFeedLoad()
         
         XCTAssertEqual(loader.loadCount, 2)
+    }
+    
+    func test_loadingIndicator_isShownOnFirstLoad() {
+        let (sut, _) = makeSUT()
+        
+        sut.simulateAppearance()
+        
+        XCTAssertTrue(sut.isShowingLoadingIndicator)
     }
     
     // MARK: - Helpers
@@ -74,11 +94,55 @@ final class FeedViewControllerTests: XCTestCase {
 }
 
 private extension FeedViewController {
+    
+    var isShowingLoadingIndicator: Bool {
+        refreshControl?.isRefreshing ?? false
+    }
+    
+    func simulateAppearance() {
+        if !isViewLoaded {
+            loadViewIfNeeded()
+            prepareForInitialAppearance()
+        }
+        
+        beginAppearanceTransition(true, animated: false)
+        endAppearanceTransition()
+    }
+    
+    func prepareForInitialAppearance() {
+        replaceRefreshControlWithSpyForiOS17Support()
+    }
+    
+    func replaceRefreshControlWithSpyForiOS17Support() {
+        let spy = UIRefreshControlSpy()
+        
+        refreshControl?.allTargets.forEach { target in
+            refreshControl?.actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
+                spy.addTarget(target, action: Selector($0), for: .valueChanged)
+            }
+        }
+        
+        refreshControl = spy
+    }
+    
     func simulateManualFeedLoad() {
         refreshControl?.allTargets.forEach { target in
             refreshControl?.actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
                 (target as NSObject).perform(Selector($0))
             }
+        }
+    }
+    
+    private class UIRefreshControlSpy: UIRefreshControl {
+        var _isRefreshing: Bool = false
+        override var isRefreshing: Bool { _isRefreshing }
+        
+        override func beginRefreshing() {
+            _isRefreshing = true
+        }
+        
+        override func endRefreshing() {
+            _isRefreshing = false
         }
     }
 }
