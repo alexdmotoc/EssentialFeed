@@ -51,14 +51,6 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadCount, 0)
     }
     
-    func test_viewIsAppearing_loadsTheFeed() {
-        let (sut, loader) = makeSUT()
-        
-        sut.simulateAppearance()
-        
-        XCTAssertEqual(loader.loadCount, 1)
-    }
-    
     func test_viewIsAppearingTwice_loadsTheFeedOnlyOnce() {
         let (sut, loader) = makeSUT()
         
@@ -68,13 +60,17 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadCount, 1)
     }
     
-    func test_manualFeedReload_requestsLoadFromLoader() {
+    func test_loadingFeed_requestsLoadFromLoader() {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        sut.simulateManualFeedLoad()
+        XCTAssertEqual(loader.loadCount, 1, "On first appearance the feed is loaded once")
         
-        XCTAssertEqual(loader.loadCount, 2)
+        sut.simulateManualFeedLoad()
+        XCTAssertEqual(loader.loadCount, 2, "On manual refresh the feed is loaded again")
+        
+        sut.simulateManualFeedLoad()
+        XCTAssertEqual(loader.loadCount, 3, "On another manual refresh the feed is loaded again")
     }
     
     func test_loadingIndicator_isShownWheneverALoadIsTriggered() {
