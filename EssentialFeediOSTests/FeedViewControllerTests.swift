@@ -49,9 +49,18 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadCount, 0)
     }
     
-    func test_loadView_loadsTheFeed() {
+    func test_viewIsAppearing_loadsTheFeed() {
         let (sut, loader) = makeSUT()
         
+        sut.simulateAppearance()
+        
+        XCTAssertEqual(loader.loadCount, 1)
+    }
+    
+    func test_viewIsAppearingTwice_loadsTheFeedOnlyOnce() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
         sut.simulateAppearance()
         
         XCTAssertEqual(loader.loadCount, 1)
