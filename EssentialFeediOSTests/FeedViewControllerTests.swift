@@ -77,21 +77,25 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadCount, 2)
     }
     
-    func test_loadingIndicator_isShownOnFirstLoad() {
-        let (sut, _) = makeSUT()
-        
-        sut.simulateAppearance()
-        
-        XCTAssertTrue(sut.isShowingLoadingIndicator)
-    }
-    
-    func test_loadingIndicator_isHiddenAfterLoadCompletes() {
+    func test_loadingIndicator_isShownWheneverALoadIsTriggered() {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeLoad()
+        loader.completeLoad(at: 0)
+        XCTAssertFalse(sut.isShowingLoadingIndicator)
+        
+        sut.simulateManualFeedLoad()
+        XCTAssertTrue(sut.isShowingLoadingIndicator)
+        
+        loader.completeLoad(at: 1)
+        XCTAssertFalse(sut.isShowingLoadingIndicator)
+        
+        sut.simulateManualFeedLoad()
+        XCTAssertTrue(sut.isShowingLoadingIndicator)
+        
+        loader.completeLoad(at: 2)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
