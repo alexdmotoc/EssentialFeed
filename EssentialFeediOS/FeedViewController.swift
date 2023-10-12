@@ -10,6 +10,7 @@ import EssentialFeed
 
 public class FeedViewController: UITableViewController {
     private var loader: FeedLoader?
+    private var models: [FeedItem] = []
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     
@@ -37,8 +38,32 @@ public class FeedViewController: UITableViewController {
     
     @objc private func loadFeed() {
         refreshControl?.beginRefreshing()
-        loader?.load { [weak self] _ in
+        loader?.load { [weak self] result in
+            switch result {
+            case .success(let items):
+                self?.models = items
+                self?.tableView.reloadData()
+            case .failure: break
+            }
             self?.refreshControl?.endRefreshing()
         }
+    }
+}
+
+// MARK: - UITableViewDataSource
+
+extension FeedViewController {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        models.count
+    }
+    
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = FeedItemCell()
+        let model = models[indexPath.row]
+        cell.descriptionLabel.text = model.description
+        cell.descriptionLabel.isHidden = model.description == nil
+        cell.locationLabel.text = model.location
+        cell.locationContainer.isHidden = model.location == nil
+        return cell
     }
 }
