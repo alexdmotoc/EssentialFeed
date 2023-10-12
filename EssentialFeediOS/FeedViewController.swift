@@ -8,15 +8,26 @@
 import UIKit
 import EssentialFeed
 
+public protocol FeedImageDataLoaderTask {
+    func cancel()
+}
+
+public protocol FeedImageDataLoader {
+    typealias Result = Swift.Result<Data, Error>
+    func load(from url: URL, completion: @escaping (Result) -> Void) -> FeedImageDataLoaderTask
+}
+
 public class FeedViewController: UITableViewController {
-    private var loader: FeedLoader?
+    private var feedLoader: FeedLoader?
+    private var imageLoader: FeedImageDataLoader?
     private var models: [FeedItem] = []
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     
-    public convenience init(loader: FeedLoader) {
+    public convenience init(feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) {
         self.init()
-        self.loader = loader
+        self.feedLoader = feedLoader
+        self.imageLoader = imageLoader
     }
     
     public override func viewDidLoad() {
@@ -38,7 +49,7 @@ public class FeedViewController: UITableViewController {
     
     @objc private func loadFeed() {
         refreshControl?.beginRefreshing()
-        loader?.load { [weak self] result in
+        feedLoader?.load { [weak self] result in
             switch result {
             case .success(let items):
                 self?.models = items
@@ -65,5 +76,15 @@ extension FeedViewController {
         cell.locationLabel.text = model.location
         cell.locationContainer.isHidden = model.location == nil
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+
+extension FeedViewController {
+    public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = cell as? FeedItemCell else { return }
+        let model = models[indexPath.row]
+        _ = imageLoader?.load(from: model.imageURL) { _ in }
     }
 }
