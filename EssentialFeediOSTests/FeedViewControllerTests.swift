@@ -133,7 +133,6 @@ final class FeedViewControllerTests: XCTestCase {
         
         sut.simulateAppearance()
         loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
-        XCTAssertEqual(loader.cancelledImageLoad, [])
         
         let cell0 = sut.simulateCellIsVisible(at: 0)
         let cell1 = sut.simulateCellIsVisible(at: 1)
@@ -148,6 +147,30 @@ final class FeedViewControllerTests: XCTestCase {
         loader.completeImageLoadWithError(at: 1)
         XCTAssertFalse(cell0.isShowingLoadingIndicator)
         XCTAssertFalse(cell1.isShowingLoadingIndicator)
+    }
+    
+    func test_imageLoading_rendersImageWhenLoadedSuccessfully() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        
+        let cell0 = sut.simulateCellIsVisible(at: 0)
+        let cell1 = sut.simulateCellIsVisible(at: 1)
+        XCTAssertEqual(cell0.renderedImageData, nil)
+        XCTAssertEqual(cell1.renderedImageData, nil)
+        
+        let imageData0 = UIImage.make(withColor: .red).pngData()!
+        loader.completeImageLoad(withData: imageData0, at: 0)
+        XCTAssertEqual(cell0.renderedImageData, imageData0)
+        XCTAssertEqual(cell1.renderedImageData, nil)
+        
+        let imageData1 = UIImage.make(withColor: .blue).pngData()!
+        loader.completeImageLoad(withData: imageData1, at: 1)
+        XCTAssertEqual(cell0.renderedImageData, imageData0)
+        XCTAssertEqual(cell1.renderedImageData, imageData1)
     }
     
     // MARK: - Helpers
@@ -226,8 +249,8 @@ final class FeedViewControllerTests: XCTestCase {
             return FeedImageDataLoaderTaskSpy { [weak self] in self?.cancelledImageLoad.append(url) }
         }
         
-        func completeImageLoad(at index: Int = 0) {
-            imageLoadRequests[index].completion(.success(Data()))
+        func completeImageLoad(withData data: Data = .init(), at index: Int = 0) {
+            imageLoadRequests[index].completion(.success(data))
         }
         
         func completeImageLoadWithError(at index: Int = 0) {
@@ -242,6 +265,7 @@ private extension FeedItemCell {
     var locationText: String? { locationLabel.text }
     var isLocationHidden: Bool { locationContainer.isHidden }
     var isShowingLoadingIndicator: Bool { feedImageContainer.isShimmering }
+    var renderedImageData: Data? { feedImageView.image?.pngData() }
 }
 
 private extension FeedViewController {
