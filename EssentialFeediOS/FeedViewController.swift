@@ -21,6 +21,7 @@ public class FeedViewController: UITableViewController {
     private var feedLoader: FeedLoader?
     private var imageLoader: FeedImageDataLoader?
     private var models: [FeedItem] = []
+    private var imageLoadTasks: [IndexPath: FeedImageDataLoaderTask] = [:]
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     
@@ -85,6 +86,13 @@ extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let cell = cell as? FeedItemCell else { return }
         let model = models[indexPath.row]
-        _ = imageLoader?.load(from: model.imageURL) { _ in }
+        imageLoadTasks[indexPath] = imageLoader?.load(from: model.imageURL) { [weak self] _ in
+            self?.imageLoadTasks[indexPath] = nil
+        }
+    }
+    
+    public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        imageLoadTasks[indexPath]?.cancel()
+        imageLoadTasks[indexPath] = nil
     }
 }

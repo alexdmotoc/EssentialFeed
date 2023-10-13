@@ -99,7 +99,6 @@ final class FeedViewControllerTests: XCTestCase {
         
         sut.simulateAppearance()
         loader.completeLoad(withFeed: [image1, image2], at: 0)
-        
         XCTAssertEqual(loader.loadedImages, [])
         
         sut.simulateCellIsVisible(at: 0)
@@ -107,6 +106,24 @@ final class FeedViewControllerTests: XCTestCase {
         
         sut.simulateCellIsVisible(at: 1)
         XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL])
+    }
+    
+    func test_imageLoading_cancelsImageLoadingWhenCellIsNotVisible() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeLoad(withFeed: [image1, image2], at: 0)
+        XCTAssertEqual(loader.cancelledImageLoad, [])
+        
+        sut.simulateCellIsVisible(at: 0)
+        sut.simulateCellIsNotVisible(at: 0)
+        XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL])
+        
+        sut.simulateCellIsVisible(at: 1)
+        sut.simulateCellIsNotVisible(at: 1)
+        XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL, image2.imageURL])
     }
     
     // MARK: - Helpers
@@ -155,7 +172,7 @@ final class FeedViewControllerTests: XCTestCase {
         var feedLoadCount: Int { completions.count }
         var loadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
         var loadedImages: [URL] { loadRequests.map { $0.url } }
-        var cancelledRequests: [URL] = []
+        var cancelledImageLoad: [URL] = []
         
         // MARK: - FeedLoader
         
@@ -182,7 +199,7 @@ final class FeedViewControllerTests: XCTestCase {
         
         func load(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
             loadRequests.append((url, completion))
-            return FeedImageDataLoaderTaskSpy { [weak self] in self?.cancelledRequests.append(url) }
+            return FeedImageDataLoaderTaskSpy { [weak self] in self?.cancelledImageLoad.append(url) }
         }
     }
 }
@@ -243,6 +260,10 @@ private extension FeedViewController {
     
     func simulateCellIsVisible(at index: Int) {
         tableView.delegate?.tableView?(tableView, willDisplay: itemCell(at: index)!, forRowAt: IndexPath(row: index, section: itemsSection))
+    }
+    
+    func simulateCellIsNotVisible(at index: Int) {
+        tableView.delegate?.tableView?(tableView, didEndDisplaying: itemCell(at: index)!, forRowAt: IndexPath(row: index, section: itemsSection))
     }
     
     func simulateManualFeedLoad() {
