@@ -86,7 +86,9 @@ extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let cell = cell as? FeedItemCell else { return }
         let model = models[indexPath.row]
-        imageLoadTasks[indexPath] = imageLoader?.load(from: model.imageURL) { [weak self] _ in
+        cell.feedImageContainer.startShimmering()
+        imageLoadTasks[indexPath] = imageLoader?.load(from: model.imageURL) { [weak self, weak cell] _ in
+            cell?.feedImageContainer.stopShimmering()
             self?.imageLoadTasks[indexPath] = nil
         }
     }

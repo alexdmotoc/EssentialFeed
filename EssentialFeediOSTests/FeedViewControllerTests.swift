@@ -45,19 +45,19 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateAppearance()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeLoad(at: 0)
+        loader.completeFeedLoad(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
         sut.simulateManualFeedLoad()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeLoad(at: 1)
+        loader.completeFeedLoad(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
         sut.simulateManualFeedLoad()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeLoad(at: 2)
+        loader.completeFeedLoad(at: 2)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
@@ -71,11 +71,11 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateAppearance()
         try assertThat(sut, isRendering: [])
         
-        loader.completeLoad(withFeed: [image1], at: 0)
+        loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
         sut.simulateManualFeedLoad()
-        loader.completeLoad(withFeed: [image1, image2, image3, image4], at: 1)
+        loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
     
@@ -84,11 +84,11 @@ final class FeedViewControllerTests: XCTestCase {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        loader.completeLoad(withFeed: [image1], at: 0)
+        loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
         sut.simulateManualFeedLoad()
-        loader.completeLoadWithError(at: 1)
+        loader.completeFeedLoadWithError(at: 1)
         try assertThat(sut, isRendering: [image1])
     }
     
@@ -98,7 +98,7 @@ final class FeedViewControllerTests: XCTestCase {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        loader.completeLoad(withFeed: [image1, image2], at: 0)
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
         XCTAssertEqual(loader.loadedImages, [])
         
         sut.simulateCellIsVisible(at: 0)
@@ -114,7 +114,7 @@ final class FeedViewControllerTests: XCTestCase {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        loader.completeLoad(withFeed: [image1, image2], at: 0)
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
         XCTAssertEqual(loader.cancelledImageLoad, [])
         
         sut.simulateCellIsVisible(at: 0)
@@ -124,6 +124,30 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateCellIsVisible(at: 1)
         sut.simulateCellIsNotVisible(at: 1)
         XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL, image2.imageURL])
+    }
+    
+    func test_imageLoading_isShowingLoadingIndicatorWhileImageLoads() throws {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        XCTAssertEqual(loader.cancelledImageLoad, [])
+        
+        let cell0 = sut.simulateCellIsVisible(at: 0)
+        let cell1 = sut.simulateCellIsVisible(at: 1)
+        
+        XCTAssertTrue(cell0.isShowingLoadingIndicator)
+        XCTAssertTrue(cell1.isShowingLoadingIndicator)
+        
+        loader.completeImageLoad(at: 0)
+        XCTAssertFalse(cell0.isShowingLoadingIndicator)
+        XCTAssertTrue(cell1.isShowingLoadingIndicator)
+        
+        loader.completeImageLoadWithError(at: 1)
+        XCTAssertFalse(cell0.isShowingLoadingIndicator)
+        XCTAssertFalse(cell1.isShowingLoadingIndicator)
     }
     
     // MARK: - Helpers
@@ -168,24 +192,24 @@ final class FeedViewControllerTests: XCTestCase {
     }
     
     private class LoaderSpy: FeedLoader, FeedImageDataLoader {
-        var completions: [(FeedLoader.Result) -> Void] = []
-        var feedLoadCount: Int { completions.count }
-        var loadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
-        var loadedImages: [URL] { loadRequests.map { $0.url } }
+        var feedCompletions: [(FeedLoader.Result) -> Void] = []
+        var feedLoadCount: Int { feedCompletions.count }
+        var imageLoadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
+        var loadedImages: [URL] { imageLoadRequests.map { $0.url } }
         var cancelledImageLoad: [URL] = []
         
         // MARK: - FeedLoader
         
         func load(completion: @escaping (FeedLoader.Result) -> Void) {
-            completions.append(completion)
+            feedCompletions.append(completion)
         }
         
-        func completeLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
-            completions[index](.success(feed))
+        func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
+            feedCompletions[index](.success(feed))
         }
         
-        func completeLoadWithError(at index: Int = 0) {
-            completions[index](.failure(NSError(domain: "mock", code: 0)))
+        func completeFeedLoadWithError(at index: Int = 0) {
+            feedCompletions[index](.failure(NSError(domain: "mock", code: 0)))
         }
         
         // MARK: - FeedImageDataLoader
@@ -198,8 +222,16 @@ final class FeedViewControllerTests: XCTestCase {
         }
         
         func load(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-            loadRequests.append((url, completion))
+            imageLoadRequests.append((url, completion))
             return FeedImageDataLoaderTaskSpy { [weak self] in self?.cancelledImageLoad.append(url) }
+        }
+        
+        func completeImageLoad(at index: Int = 0) {
+            imageLoadRequests[index].completion(.success(Data()))
+        }
+        
+        func completeImageLoadWithError(at index: Int = 0) {
+            imageLoadRequests[index].completion(.failure(NSError(domain: "mock", code: 0)))
         }
     }
 }
@@ -209,6 +241,7 @@ private extension FeedItemCell {
     var isDescriptionHidden: Bool { descriptionLabel.isHidden }
     var locationText: String? { locationLabel.text }
     var isLocationHidden: Bool { locationContainer.isHidden }
+    var isShowingLoadingIndicator: Bool { feedImageContainer.isShimmering }
 }
 
 private extension FeedViewController {
@@ -258,8 +291,11 @@ private extension FeedViewController {
         return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: itemsSection)) as? FeedItemCell
     }
     
-    func simulateCellIsVisible(at index: Int) {
-        tableView.delegate?.tableView?(tableView, willDisplay: itemCell(at: index)!, forRowAt: IndexPath(row: index, section: itemsSection))
+    @discardableResult
+    func simulateCellIsVisible(at index: Int) -> FeedItemCell {
+        let cell = itemCell(at: index)!
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
+        return cell
     }
     
     func simulateCellIsNotVisible(at index: Int) {
