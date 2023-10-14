@@ -217,6 +217,30 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertFalse(cell1.isRetryButtonHidden)
     }
     
+    func test_imageLoading_retriesImageLoadWhenRetryButtonPressed() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        XCTAssertEqual(loader.loadedImages, [])
+        
+        let cell0 = sut.simulateCellIsVisible(at: 0)
+        let cell1 = sut.simulateCellIsVisible(at: 1)
+        XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL])
+        
+        loader.completeImageLoadWithError(at: 0)
+        loader.completeImageLoadWithError(at: 1)
+        XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL])
+        
+        cell0.simulateRetryAction()
+        XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL, image1.imageURL])
+        
+        cell1.simulateRetryAction()
+        XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL, image1.imageURL, image2.imageURL])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -303,6 +327,26 @@ final class FeedViewControllerTests: XCTestCase {
     }
 }
 
+private extension UIButton {
+    func simulateTap() {
+        allTargets.forEach { target in
+            actions(forTarget: target, forControlEvent: .touchUpInside)?.forEach {
+                (target as NSObject).perform(Selector($0))
+            }
+        }
+    }
+}
+
+private extension UIRefreshControl {
+    func simulateManualRefresh() {
+        allTargets.forEach { target in
+            actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
+                (target as NSObject).perform(Selector($0))
+            }
+        }
+    }
+}
+
 private extension FeedItemCell {
     var descriptionText: String? { descriptionLabel.text }
     var isDescriptionHidden: Bool { descriptionLabel.isHidden }
@@ -311,6 +355,10 @@ private extension FeedItemCell {
     var isShowingLoadingIndicator: Bool { feedImageContainer.isShimmering }
     var renderedImageData: Data? { feedImageView.image?.pngData() }
     var isRetryButtonHidden: Bool { retryButton.isHidden }
+    
+    func simulateRetryAction() {
+        retryButton.simulateTap()
+    }
 }
 
 private extension FeedViewController {
@@ -372,11 +420,7 @@ private extension FeedViewController {
     }
     
     func simulateManualFeedLoad() {
-        refreshControl?.allTargets.forEach { target in
-            refreshControl?.actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
-                (target as NSObject).perform(Selector($0))
-            }
-        }
+        refreshControl?.simulateManualRefresh()
     }
     
     private class UIRefreshControlSpy: UIRefreshControl {
