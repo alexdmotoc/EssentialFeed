@@ -9,13 +9,13 @@ import UIKit
 import EssentialFeed
 
 public class FeedViewController: UITableViewController {
-    private var feedLoader: FeedLoader?
-    private var imageLoader: FeedImageDataLoader?
-    private var models: [FeedCellController] = [] {
+    
+    var models: [FeedCellController] = [] {
         didSet {
             tableView.reloadData()
         }
     }
+    
     private var refreshController: FeedRefreshViewController?
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
@@ -26,14 +26,9 @@ public class FeedViewController: UITableViewController {
         }
     }
     
-    public convenience init(feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) {
+    convenience init(refreshController: FeedRefreshViewController) {
         self.init()
-        self.feedLoader = feedLoader
-        self.imageLoader = imageLoader
-        refreshController = .init(loader: feedLoader)
-        refreshController?.onRefresh = { [weak self] models in
-            self?.models = models.map { FeedCellController(model: $0, loader: self!.imageLoader!) }
-        }
+        self.refreshController = refreshController
     }
     
     public override func viewDidLoad() {
