@@ -34,6 +34,8 @@ public class FeedViewController: UITableViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.prefetchDataSource = self
+        
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(self.loadFeed), for: .valueChanged)
         
@@ -61,10 +63,10 @@ public class FeedViewController: UITableViewController {
         }
     }
     
-    private func loadImage(at indexPath: IndexPath, forCell cell: FeedItemCell) {
+    private func loadImage(at indexPath: IndexPath, forCell cell: FeedItemCell?) {
         let model = models[indexPath.row]
-        cell.retryButton.isHidden = true
-        cell.feedImageContainer.startShimmering()
+        cell?.retryButton.isHidden = true
+        cell?.feedImageContainer.startShimmering()
         imageLoadTasks[indexPath] = imageLoader?.load(from: model.imageURL) { [weak self, weak cell] result in
             let data = try? result.get()
             let image = data.map(UIImage.init) ?? nil
@@ -73,6 +75,11 @@ public class FeedViewController: UITableViewController {
             cell?.feedImageContainer.stopShimmering()
             self?.imageLoadTasks[indexPath] = nil
         }
+    }
+    
+    private func cancelImageLoad(at indexPath: IndexPath) {
+        imageLoadTasks[indexPath]?.cancel()
+        imageLoadTasks[indexPath] = nil
     }
 }
 
@@ -102,12 +109,22 @@ extension FeedViewController {
 
 extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = cell as? FeedItemCell else { return }
-        loadImage(at: indexPath, forCell: cell)
+        loadImage(at: indexPath, forCell: cell as? FeedItemCell)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        imageLoadTasks[indexPath]?.cancel()
-        imageLoadTasks[indexPath] = nil
+        cancelImageLoad(at: indexPath)
+    }
+}
+
+// MARK: - UITableViewDataSourcePrefetching
+
+extension FeedViewController: UITableViewDataSourcePrefetching {
+    public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        indexPaths.forEach { loadImage(at: $0, forCell: nil) }
+    }
+    
+    public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+        
     }
 }
