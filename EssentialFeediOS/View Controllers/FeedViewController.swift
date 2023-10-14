@@ -11,15 +11,30 @@ import EssentialFeed
 public class FeedViewController: UITableViewController {
     private var feedLoader: FeedLoader?
     private var imageLoader: FeedImageDataLoader?
-    private var models: [FeedItem] = []
+    private var models: [FeedItem] = [] {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    private var refreshController: FeedRefreshViewController?
     private var imageLoadTasks: [IndexPath: FeedImageDataLoaderTask] = [:]
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
+    
+    public override var refreshControl: UIRefreshControl? {
+        didSet {
+            refreshController?.view = refreshControl!
+        }
+    }
     
     public convenience init(feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) {
         self.init()
         self.feedLoader = feedLoader
         self.imageLoader = imageLoader
+        refreshController = .init(loader: feedLoader)
+        refreshController?.onRefresh = { [weak self] models in
+            self?.models = models
+        }
     }
     
     public override func viewDidLoad() {
@@ -27,11 +42,10 @@ public class FeedViewController: UITableViewController {
         
         tableView.prefetchDataSource = self
         
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(self.loadFeed), for: .valueChanged)
+        refreshControl = refreshController?.view
         
         onViewIsAppearing = { vc in
-            vc.loadFeed()
+            vc.refreshController?.load()
             vc.onViewIsAppearing = nil
         }
     }
@@ -39,19 +53,6 @@ public class FeedViewController: UITableViewController {
     public override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         onViewIsAppearing?(self)
-    }
-    
-    @objc private func loadFeed() {
-        refreshControl?.beginRefreshing()
-        feedLoader?.load { [weak self] result in
-            switch result {
-            case .success(let items):
-                self?.models = items
-                self?.tableView.reloadData()
-            case .failure: break
-            }
-            self?.refreshControl?.endRefreshing()
-        }
     }
     
     private func loadImage(at indexPath: IndexPath, forCell cell: FeedItemCell?) {

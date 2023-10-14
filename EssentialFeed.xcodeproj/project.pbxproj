@@ -47,6 +47,7 @@
 		87D5E7BB2A79676600D6142E /* FeedItemMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7BA2A79676600D6142E /* FeedItemMapper.swift */; };
 		87D5E7BD2A798E9900D6142E /* URLSessionHTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5E7BC2A798E9900D6142E /* URLSessionHTTPClientTests.swift */; };
 		87D94BE22ADADB3F003ED23C /* FeedImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D94BE12ADADB3F003ED23C /* FeedImageDataLoader.swift */; };
+		87D94BE42ADAF260003ED23C /* FeedRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D94BE32ADAF260003ED23C /* FeedRefreshViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -142,6 +143,7 @@
 		87D5E7BA2A79676600D6142E /* FeedItemMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemMapper.swift; sourceTree = "<group>"; };
 		87D5E7BC2A798E9900D6142E /* URLSessionHTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClientTests.swift; sourceTree = "<group>"; };
 		87D94BE12ADADB3F003ED23C /* FeedImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedImageDataLoader.swift; sourceTree = "<group>"; };
+		87D94BE32ADAF260003ED23C /* FeedRefreshViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedRefreshViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -380,6 +382,7 @@
 			isa = PBXGroup;
 			children = (
 				87D530042AD6E71C0073AF4F /* FeedViewController.swift */,
+				87D94BE32ADAF260003ED23C /* FeedRefreshViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -655,6 +658,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				87D94BE22ADADB3F003ED23C /* FeedImageDataLoader.swift in Sources */,
+				87D94BE42ADAF260003ED23C /* FeedRefreshViewController.swift in Sources */,
 				87D5300F2AD845510073AF4F /* FeedItemCell.swift in Sources */,
 				87D530052AD6E71C0073AF4F /* FeedViewController.swift in Sources */,
 				87D5300D2AD709CE0073AF4F /* UIView+Shimmering.swift in Sources */,
