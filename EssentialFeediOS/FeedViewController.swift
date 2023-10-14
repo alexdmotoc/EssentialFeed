@@ -125,6 +125,6 @@ extension FeedViewController: UITableViewDataSourcePrefetching {
     }
     
     public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        
+        indexPaths.forEach(cancelImageLoad(at:))
     }
 }

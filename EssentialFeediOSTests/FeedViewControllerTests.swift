@@ -257,6 +257,22 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadedImages, [image1.imageURL, image2.imageURL])
     }
     
+    func test_imageLoading_cancelsPreloadingImagesWhenNotVisible() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        XCTAssertEqual(loader.cancelledImageLoad, [])
+        
+        sut.simulateCancelCellPreload(at: 0)
+        XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL])
+        
+        sut.simulateCancelCellPreload(at: 1)
+        XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL, image2.imageURL])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -441,6 +457,11 @@ private extension FeedViewController {
     
     func simulateCellPreload(at index: Int) {
         tableView.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [IndexPath(row: index, section: itemsSection)])
+    }
+    
+    func simulateCancelCellPreload(at index: Int) {
+        simulateCellPreload(at: index)
+        tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: itemsSection)])
     }
     
     private class UIRefreshControlSpy: UIRefreshControl {
