@@ -195,6 +195,28 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertFalse(cell1.isRetryButtonHidden)
     }
     
+    func test_imageLoading_showsRetryButtonOnInvalidImageData() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        
+        let cell0 = sut.simulateCellIsVisible(at: 0)
+        let cell1 = sut.simulateCellIsVisible(at: 1)
+        XCTAssertTrue(cell0.isRetryButtonHidden)
+        XCTAssertTrue(cell1.isRetryButtonHidden)
+        
+        loader.completeImageLoad(withData: Data("invalid image data".utf8), at: 0)
+        XCTAssertFalse(cell0.isRetryButtonHidden)
+        XCTAssertTrue(cell1.isRetryButtonHidden)
+        
+        loader.completeImageLoadWithError(at: 1)
+        XCTAssertFalse(cell0.isRetryButtonHidden)
+        XCTAssertFalse(cell1.isRetryButtonHidden)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
