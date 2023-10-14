@@ -86,10 +86,12 @@ extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let cell = cell as? FeedItemCell else { return }
         let model = models[indexPath.row]
+        cell.retryButton.isHidden = true
         cell.feedImageContainer.startShimmering()
         imageLoadTasks[indexPath] = imageLoader?.load(from: model.imageURL) { [weak self, weak cell] result in
             let data = try? result.get()
             let image = data.map(UIImage.init) ?? nil
+            cell?.retryButton.isHidden = image != nil
             cell?.feedImageView.image = image
             cell?.feedImageContainer.stopShimmering()
             self?.imageLoadTasks[indexPath] = nil

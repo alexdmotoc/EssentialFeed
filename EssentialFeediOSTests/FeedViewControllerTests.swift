@@ -173,6 +173,28 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(cell1.renderedImageData, imageData1)
     }
     
+    func test_imageLoading_showsRetryButtonOnLoadImageError() {
+        let image1 = makeImage(url: URL(string: "https://some-url-1.com")!)
+        let image2 = makeImage(url: URL(string: "https://some-url-2.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        
+        let cell0 = sut.simulateCellIsVisible(at: 0)
+        let cell1 = sut.simulateCellIsVisible(at: 1)
+        XCTAssertTrue(cell0.isRetryButtonHidden)
+        XCTAssertTrue(cell1.isRetryButtonHidden)
+        
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertTrue(cell0.isRetryButtonHidden)
+        XCTAssertTrue(cell1.isRetryButtonHidden)
+        
+        loader.completeImageLoadWithError(at: 1)
+        XCTAssertTrue(cell0.isRetryButtonHidden)
+        XCTAssertFalse(cell1.isRetryButtonHidden)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -266,6 +288,7 @@ private extension FeedItemCell {
     var isLocationHidden: Bool { locationContainer.isHidden }
     var isShowingLoadingIndicator: Bool { feedImageContainer.isShimmering }
     var renderedImageData: Data? { feedImageView.image?.pngData() }
+    var isRetryButtonHidden: Bool { retryButton.isHidden }
 }
 
 private extension FeedViewController {
