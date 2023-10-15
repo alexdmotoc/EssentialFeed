@@ -5,6 +5,7 @@
 //  Created by Alex Motoc on 14.10.2023.
 //
 
+import UIKit
 import EssentialFeed
 
 public enum FeedUIComposer {
@@ -21,7 +22,15 @@ public enum FeedUIComposer {
         imageLoader: FeedImageDataLoader
     ) -> ([FeedItem]) -> Void {
         { [weak controller] items in
-            controller?.models = items.map { FeedCellController(model: $0, loader: imageLoader) }
+            controller?.models = items.map { 
+                FeedCellController(
+                    viewModel: FeedImageViewModel(
+                        model: $0,
+                        loader: imageLoader,
+                        imageTransformer: UIImage.init
+                    )
+                )
+            }
         }
     }
 }
