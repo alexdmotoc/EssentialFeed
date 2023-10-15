@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import EssentialFeed
 
 public class FeedViewController: UITableViewController {
     
@@ -70,7 +69,7 @@ extension FeedViewController {
 
 extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cellController(at: indexPath).loadImage(forCell: cell as? FeedItemCell)
+        cellController(at: indexPath).loadImage()
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -82,7 +81,7 @@ extension FeedViewController {
 
 extension FeedViewController: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { cellController(at: $0).loadImage(forCell: nil) }
+        indexPaths.forEach { cellController(at: $0).loadImage() }
     }
     
     public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
