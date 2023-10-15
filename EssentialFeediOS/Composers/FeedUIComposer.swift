@@ -10,8 +10,9 @@ import EssentialFeed
 
 public enum FeedUIComposer {
     public static func makeFeedController(with feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) -> FeedViewController {
-        let feedPresenter = FeedPresenter(loader: feedLoader)
-        let refreshController = FeedRefreshViewController(loadFeed: feedPresenter.load)
+        let feedPresenter = FeedPresenter()
+        let feedLoaderPresenterAdapter = FeedLoaderPresenterAdapter(loader: feedLoader, presenter: feedPresenter)
+        let refreshController = FeedRefreshViewController(loadFeed: feedLoaderPresenterAdapter.load)
         let feedController = FeedViewController(refreshController: refreshController)
         let feedItemAdapter = FeedItemAdapter(controller: feedController, imageLoader: imageLoader)
         feedPresenter.feedLoadingView = WeakRefVirtualProxy(object: refreshController)
@@ -30,6 +31,28 @@ private final class WeakRefVirtualProxy<T: AnyObject> {
 extension WeakRefVirtualProxy: FeedLoadingView where T: FeedLoadingView {
     func display(_ viewModel: FeedLoadingViewModel) {
         object?.display(viewModel)
+    }
+}
+
+private final class FeedLoaderPresenterAdapter {
+    private let loader: FeedLoader
+    private let presenter: FeedPresenter
+    
+    init(loader: FeedLoader, presenter: FeedPresenter) {
+        self.loader = loader
+        self.presenter = presenter
+    }
+    
+    func load() {
+        presenter.didStartLoading()
+        loader.load { [weak self] result in
+            switch result {
+            case .success(let items):
+                self?.presenter.didEndLoading(with: items)
+            case .failure(let error):
+                self?.presenter.didEndLoading(with: error)
+            }
+        }
     }
 }
 
