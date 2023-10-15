@@ -15,7 +15,7 @@ public enum FeedUIComposer {
         let feedController = FeedViewController(refreshController: refreshController)
         let feedItemAdapter = FeedItemAdapter(controller: feedController, imageLoader: imageLoader)
         feedLoaderPresenterAdapter.presenter = FeedPresenter(
-            feedLoadingView: WeakRefVirtualProxy(object: refreshController),
+            feedLoadingView: WeakRefVirtualProxy(refreshController),
             feedView: feedItemAdapter
         )
         return feedController
@@ -24,13 +24,19 @@ public enum FeedUIComposer {
 
 private final class WeakRefVirtualProxy<T: AnyObject> {
     private weak var object: T?
-    init(object: T?) {
+    init(_ object: T?) {
         self.object = object
     }
 }
 
 extension WeakRefVirtualProxy: FeedLoadingView where T: FeedLoadingView {
     func display(_ viewModel: FeedLoadingViewModel) {
+        object?.display(viewModel)
+    }
+}
+
+extension WeakRefVirtualProxy: FeedImageView where T: FeedImageView, T.Image == UIImage {
+    func display(_ viewModel: FeedImageViewModel<UIImage>) {
         object?.display(viewModel)
     }
 }
@@ -67,13 +73,46 @@ private final class FeedItemAdapter: FeedView {
     
     func display(_ viewModel: FeedViewModel) {
         controller?.models = viewModel.feed.map {
-            FeedCellController(
-                viewModel: FeedImageViewModel(
-                    model: $0,
-                    loader: imageLoader,
-                    imageTransformer: UIImage.init
-                )
+            let adapter = FeedItemPresentationAdapter<WeakRefVirtualProxy<FeedCellController>, UIImage>(
+                model: $0,
+                loader: imageLoader
             )
+            let view = FeedCellController(delegate: adapter)
+            adapter.presenter = .init(view: WeakRefVirtualProxy(view), imageTransformer: UIImage.init)
+            adapter.presenter?.initialCellDisplay(for: $0)
+            return view
         }
+    }
+}
+
+private final class FeedItemPresentationAdapter<View: FeedImageView, Image>: FeedCellControllerDelegate where View.Image == Image {
+    
+    private let model: FeedItem
+    private let loader: FeedImageDataLoader
+    private var task: FeedImageDataLoaderTask?
+    
+    var presenter: FeedImagePresenter<View, Image>?
+    
+    init(model: FeedItem, loader: FeedImageDataLoader) {
+        self.model = model
+        self.loader = loader
+    }
+    
+    func didRequestImage() {
+        presenter?.didStartLoadingImage(for: model)
+        task = loader.load(from: model.imageURL) { [weak self, model] result in
+            self?.task = nil
+            switch result {
+            case .success(let data):
+                self?.presenter?.didEndLoadingImage(with: data, for: model)
+            case .failure(let error):
+                self?.presenter?.didEndLoadingImage(with: error, for: model)
+            }
+        }
+    }
+    
+    func didCancelImageRequest() {
+        task?.cancel()
+        task = nil
     }
 }

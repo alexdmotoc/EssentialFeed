@@ -304,10 +304,10 @@ final class FeedViewControllerTests: XCTestCase {
         line: UInt = #line
     ) throws {
         let itemCell = try XCTUnwrap(sut.itemCell(at: index), "Expected to retrieve cell at \(index)", file: file, line: line)
-        XCTAssertEqual(itemCell.descriptionText, image.description, file: file, line: line)
-        XCTAssertEqual(itemCell.isDescriptionHidden, image.description == nil, file: file, line: line)
-        XCTAssertEqual(itemCell.locationText, image.location, file: file, line: line)
-        XCTAssertEqual(itemCell.isLocationHidden, image.location == nil, file: file, line: line)
+        XCTAssertEqual(itemCell.descriptionText, image.description, "Expected description to match", file: file, line: line)
+        XCTAssertEqual(itemCell.isDescriptionHidden, image.description == nil, "Expected description to have same visibility", file: file, line: line)
+        XCTAssertEqual(itemCell.locationText, image.location, "Expected location to match", file: file, line: line)
+        XCTAssertEqual(itemCell.isLocationHidden, image.location == nil, "Expected location to have the same visibility", file: file, line: line)
     }
     
     private func makeImage(description: String? = nil, location: String? = nil, url: URL = URL(string: "someUrl.com")!) -> FeedItem {
