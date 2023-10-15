@@ -10,13 +10,14 @@ import EssentialFeed
 
 public enum FeedUIComposer {
     public static func makeFeedController(with feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) -> FeedViewController {
-        let feedPresenter = FeedPresenter()
-        let feedLoaderPresenterAdapter = FeedLoaderPresenterAdapter(loader: feedLoader, presenter: feedPresenter)
+        let feedLoaderPresenterAdapter = FeedLoaderPresenterAdapter(loader: feedLoader)
         let refreshController = FeedRefreshViewController(delegate: feedLoaderPresenterAdapter)
         let feedController = FeedViewController(refreshController: refreshController)
         let feedItemAdapter = FeedItemAdapter(controller: feedController, imageLoader: imageLoader)
-        feedPresenter.feedLoadingView = WeakRefVirtualProxy(object: refreshController)
-        feedPresenter.feedView = feedItemAdapter
+        feedLoaderPresenterAdapter.presenter = FeedPresenter(
+            feedLoadingView: WeakRefVirtualProxy(object: refreshController),
+            feedView: feedItemAdapter
+        )
         return feedController
     }
 }
@@ -36,21 +37,20 @@ extension WeakRefVirtualProxy: FeedLoadingView where T: FeedLoadingView {
 
 private final class FeedLoaderPresenterAdapter: FeedRefreshViewControllerDelegate {
     private let loader: FeedLoader
-    private let presenter: FeedPresenter
+    var presenter: FeedPresenter?
     
-    init(loader: FeedLoader, presenter: FeedPresenter) {
+    init(loader: FeedLoader) {
         self.loader = loader
-        self.presenter = presenter
     }
     
     func didRequestFeedRefresh() {
-        presenter.didStartLoading()
+        presenter?.didStartLoading()
         loader.load { [weak self] result in
             switch result {
             case .success(let items):
-                self?.presenter.didEndLoading(with: items)
+                self?.presenter?.didEndLoading(with: items)
             case .failure(let error):
-                self?.presenter.didEndLoading(with: error)
+                self?.presenter?.didEndLoading(with: error)
             }
         }
     }
