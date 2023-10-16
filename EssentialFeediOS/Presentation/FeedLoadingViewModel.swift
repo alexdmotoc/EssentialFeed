@@ -5,7 +5,7 @@
 //  Created by Alex Motoc on 15.10.2023.
 //
 
-import EssentialFeed
+import Foundation
 
 struct FeedLoadingViewModel {
     let isLoading: Bool
