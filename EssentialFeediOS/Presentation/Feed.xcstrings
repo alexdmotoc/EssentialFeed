@@ -9,6 +9,12 @@
             "state" : "translated",
             "value" : "My feed"
           }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedul meu"
+          }
         }
       }
     }
