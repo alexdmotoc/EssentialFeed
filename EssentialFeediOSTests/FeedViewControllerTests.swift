@@ -273,6 +273,17 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL, image2.imageURL])
     }
     
+    func test_imageLoading_doesNotChangeImageWhenCellIsOutOfScreen() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsNotVisible(at: 0)
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertEqual(cell.renderedImageData, nil)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -447,8 +458,11 @@ private extension FeedViewController {
         return cell
     }
     
-    func simulateCellIsNotVisible(at index: Int) {
-        tableView.delegate?.tableView?(tableView, didEndDisplaying: itemCell(at: index)!, forRowAt: IndexPath(row: index, section: itemsSection))
+    @discardableResult
+    func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
+        let cell = simulateCellIsVisible(at: index)
+        tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
+        return cell
     }
     
     func simulateManualFeedLoad() {

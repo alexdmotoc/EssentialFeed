@@ -49,5 +49,10 @@ final class FeedCellController: FeedImageView {
     
     func cancelLoad() {
         delegate.didCancelImageRequest()
+        releaseCellReference()
+    }
+    
+    private func releaseCellReference() {
+        cell = nil
     }
 }
