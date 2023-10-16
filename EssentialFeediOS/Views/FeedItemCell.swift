@@ -16,6 +16,12 @@ public final class FeedItemCell: UITableViewCell {
     @IBOutlet private(set) public weak var retryButton: UIButton!
     
     var onRetry: (() -> Void)?
+    var onPrepareForReuse: (() -> Void)?
+    
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        onPrepareForReuse?()
+    }
     
     @IBAction private func didTapRetry() {
         onRetry?()

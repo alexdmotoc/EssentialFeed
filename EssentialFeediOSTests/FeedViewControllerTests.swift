@@ -284,6 +284,19 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(cell.renderedImageData, nil)
     }
     
+    func test_imageLoading_doesNotShowDataFromPreviousRequestAfterCellIsReused() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsVisible(at: 0)
+        cell.prepareForReuse()
+        
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertEqual(cell.renderedImageData, nil)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
