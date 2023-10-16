@@ -11,16 +11,15 @@ import EssentialFeed
 public enum FeedUIComposer {
     public static func makeFeedController(with feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) -> FeedViewController {
         let feedLoaderPresenterAdapter = FeedLoaderPresenterAdapter(loader: feedLoader)
-        let refreshController = FeedRefreshViewController(delegate: feedLoaderPresenterAdapter)
         
         let bundle = Bundle(for: FeedViewController.self)
         let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
         let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
-        feedController.refreshController = refreshController
+        feedController.delegate = feedLoaderPresenterAdapter
         
         let feedItemAdapter = FeedItemAdapter(controller: feedController, imageLoader: imageLoader)
         feedLoaderPresenterAdapter.presenter = FeedPresenter(
-            feedLoadingView: WeakRefVirtualProxy(refreshController),
+            feedLoadingView: WeakRefVirtualProxy(feedController),
             feedView: feedItemAdapter
         )
         return feedController
@@ -46,7 +45,7 @@ extension WeakRefVirtualProxy: FeedImageView where T: FeedImageView, T.Image == 
     }
 }
 
-private final class FeedLoaderPresenterAdapter: FeedRefreshViewControllerDelegate {
+private final class FeedLoaderPresenterAdapter: FeedViewControllerDelegate {
     private let loader: FeedLoader
     var presenter: FeedPresenter?
     
