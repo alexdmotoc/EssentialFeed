@@ -33,7 +33,7 @@ final class FeedCellController: FeedImageView {
         cell?.descriptionLabel.isHidden = viewModel.description == nil
         cell?.locationLabel.text = viewModel.location
         cell?.locationContainer.isHidden = viewModel.location == nil
-        cell?.feedImageView.image = viewModel.image
+        cell?.feedImageView.setImageAnimated(viewModel.image)
         cell?.retryButton.isHidden = viewModel.isRetryHidden
         cell?.onRetry = delegate.didRequestImage
         if viewModel.isLoading {
