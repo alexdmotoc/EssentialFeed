@@ -1,5 +1,5 @@
 //
-//  FeedViewControllerTests.swift
+//  FeedUIIntegrationTests.swift
 //  EssentialFeediOSTests
 //
 //  Created by Alex Motoc on 11.10.2023.
@@ -9,7 +9,7 @@ import XCTest
 import EssentialFeed
 import EssentialFeediOS
 
-final class FeedViewControllerTests: XCTestCase {
+final class FeedUIIntegrationTests: XCTestCase {
     
     func test_init_doesNotLoadFeed() {
         let (_, loader) = makeSUT()
@@ -349,175 +349,5 @@ final class FeedViewControllerTests: XCTestCase {
     
     private func makeImage(description: String? = nil, location: String? = nil, url: URL = URL(string: "someUrl.com")!) -> FeedItem {
         FeedItem(id: UUID(), description: description, location: location, imageURL: url)
-    }
-    
-    private class LoaderSpy: FeedLoader, FeedImageDataLoader {
-        var feedCompletions: [(FeedLoader.Result) -> Void] = []
-        var feedLoadCount: Int { feedCompletions.count }
-        var imageLoadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
-        var loadedImages: [URL] { imageLoadRequests.map { $0.url } }
-        var cancelledImageLoad: [URL] = []
-        
-        // MARK: - FeedLoader
-        
-        func load(completion: @escaping (FeedLoader.Result) -> Void) {
-            feedCompletions.append(completion)
-        }
-        
-        func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
-            feedCompletions[index](.success(feed))
-        }
-        
-        func completeFeedLoadWithError(at index: Int = 0) {
-            feedCompletions[index](.failure(NSError(domain: "mock", code: 0)))
-        }
-        
-        // MARK: - FeedImageDataLoader
-        
-        private struct FeedImageDataLoaderTaskSpy: FeedImageDataLoaderTask {
-            let cancelHandler: () -> Void
-            func cancel() {
-                cancelHandler()
-            }
-        }
-        
-        func load(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-            imageLoadRequests.append((url, completion))
-            return FeedImageDataLoaderTaskSpy { [weak self] in self?.cancelledImageLoad.append(url) }
-        }
-        
-        func completeImageLoad(withData data: Data = .init(), at index: Int = 0) {
-            imageLoadRequests[index].completion(.success(data))
-        }
-        
-        func completeImageLoadWithError(at index: Int = 0) {
-            imageLoadRequests[index].completion(.failure(NSError(domain: "mock", code: 0)))
-        }
-    }
-}
-
-private extension UIButton {
-    func simulateTap() {
-        allTargets.forEach { target in
-            actions(forTarget: target, forControlEvent: .touchUpInside)?.forEach {
-                (target as NSObject).perform(Selector($0))
-            }
-        }
-    }
-}
-
-private extension UIRefreshControl {
-    func simulateManualRefresh() {
-        allTargets.forEach { target in
-            actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
-                (target as NSObject).perform(Selector($0))
-            }
-        }
-    }
-}
-
-private extension FeedItemCell {
-    var descriptionText: String? { descriptionLabel.text }
-    var isDescriptionHidden: Bool { descriptionLabel.isHidden }
-    var locationText: String? { locationLabel.text }
-    var isLocationHidden: Bool { locationContainer.isHidden }
-    var isShowingLoadingIndicator: Bool { feedImageContainer.isShimmering }
-    var renderedImageData: Data? { feedImageView.image?.pngData() }
-    var isRetryButtonHidden: Bool { retryButton.isHidden }
-    
-    func simulateRetryAction() {
-        retryButton.simulateTap()
-    }
-}
-
-private extension FeedViewController {
-    
-    var isShowingLoadingIndicator: Bool {
-        refreshControl?.isRefreshing ?? false
-    }
-    
-    var numberOfRenderedImages: Int {
-        tableView.numberOfRows(inSection: 0)
-    }
-    
-    // MARK: - Initialization support
-    
-    func simulateAppearance() {
-        if !isViewLoaded {
-            loadViewIfNeeded()
-            prepareForInitialAppearance()
-        }
-        
-        beginAppearanceTransition(true, animated: false)
-        endAppearanceTransition()
-    }
-    
-    func prepareForInitialAppearance() {
-        replaceRefreshControlWithSpyForiOS17Support()
-    }
-    
-    func replaceRefreshControlWithSpyForiOS17Support() {
-        let spy = UIRefreshControlSpy()
-        
-        refreshControl?.allTargets.forEach { target in
-            refreshControl?.actions(forTarget: target, forControlEvent: .valueChanged)?.forEach {
-                spy.addTarget(target, action: Selector($0), for: .valueChanged)
-            }
-        }
-        
-        refreshControl = spy
-    }
-    
-    // MARK: - Utility
-    
-    var itemsSection: Int { 0 }
-    
-    func itemCell(at index: Int) -> FeedItemCell? {
-        let dataSource = tableView.dataSource
-        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: itemsSection)) as? FeedItemCell
-    }
-    
-    @discardableResult
-    func simulateCellIsVisible(at index: Int) -> FeedItemCell {
-        let cell = itemCell(at: index)!
-        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-        return cell
-    }
-    
-    @discardableResult
-    func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
-        let cell = simulateCellIsVisible(at: index)
-        tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-        return cell
-    }
-    
-    func simulateCellIsRedisplayed(_ cell: FeedItemCell, at index: Int) {
-        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-    }
-    
-    func simulateManualFeedLoad() {
-        refreshControl?.simulateManualRefresh()
-    }
-    
-    func simulateCellPreload(at index: Int) {
-        tableView.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [IndexPath(row: index, section: itemsSection)])
-    }
-    
-    func simulateCancelCellPreload(at index: Int) {
-        simulateCellPreload(at: index)
-        tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: itemsSection)])
-    }
-    
-    private class UIRefreshControlSpy: UIRefreshControl {
-        var _isRefreshing: Bool = false
-        override var isRefreshing: Bool { _isRefreshing }
-        
-        override func beginRefreshing() {
-            _isRefreshing = true
-        }
-        
-        override func endRefreshing() {
-            _isRefreshing = false
-        }
     }
 }
