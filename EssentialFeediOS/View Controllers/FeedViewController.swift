@@ -15,7 +15,7 @@ public class FeedViewController: UITableViewController {
         }
     }
     
-    private var refreshController: FeedRefreshViewController?
+    var refreshController: FeedRefreshViewController?
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     
@@ -23,11 +23,6 @@ public class FeedViewController: UITableViewController {
         didSet {
             refreshController?.view = refreshControl!
         }
-    }
-    
-    convenience init(refreshController: FeedRefreshViewController) {
-        self.init()
-        self.refreshController = refreshController
     }
     
     public override func viewDidLoad() {
@@ -61,7 +56,7 @@ extension FeedViewController {
     }
     
     public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        cellController(at: indexPath).view()
+        cellController(at: indexPath).view(in: tableView)
     }
 }
 

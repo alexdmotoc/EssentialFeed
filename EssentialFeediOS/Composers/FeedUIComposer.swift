@@ -12,7 +12,12 @@ public enum FeedUIComposer {
     public static func makeFeedController(with feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) -> FeedViewController {
         let feedLoaderPresenterAdapter = FeedLoaderPresenterAdapter(loader: feedLoader)
         let refreshController = FeedRefreshViewController(delegate: feedLoaderPresenterAdapter)
-        let feedController = FeedViewController(refreshController: refreshController)
+        
+        let bundle = Bundle(for: FeedViewController.self)
+        let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
+        let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
+        feedController.refreshController = refreshController
+        
         let feedItemAdapter = FeedItemAdapter(controller: feedController, imageLoader: imageLoader)
         feedLoaderPresenterAdapter.presenter = FeedPresenter(
             feedLoadingView: WeakRefVirtualProxy(refreshController),
@@ -79,7 +84,6 @@ private final class FeedItemAdapter: FeedView {
             )
             let view = FeedCellController(delegate: adapter)
             adapter.presenter = .init(view: WeakRefVirtualProxy(view), imageTransformer: UIImage.init)
-            adapter.presenter?.initialCellDisplay(for: $0)
             return view
         }
     }
@@ -114,5 +118,9 @@ private final class FeedItemPresentationAdapter<View: FeedImageView, Image>: Fee
     func didCancelImageRequest() {
         task?.cancel()
         task = nil
+    }
+    
+    func didDequeueCell() {
+        presenter?.didDequeueCell(for: model)
     }
 }
