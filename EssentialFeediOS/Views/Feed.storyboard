@@ -114,6 +114,7 @@
                         <connections>
                             <outlet property="dataSource" destination="vRT-3d-J3P" id="vB2-Nr-6aj"/>
                             <outlet property="delegate" destination="vRT-3d-J3P" id="znA-tQ-Hu0"/>
+                            <outlet property="prefetchDataSource" destination="vRT-3d-J3P" id="TgW-qs-2CD"/>
                         </connections>
                     </tableView>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="FWh-Td-2XB">
