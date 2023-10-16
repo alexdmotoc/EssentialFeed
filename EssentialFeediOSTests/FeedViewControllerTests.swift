@@ -273,6 +273,43 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.cancelledImageLoad, [image1.imageURL, image2.imageURL])
     }
     
+    func test_imageLoading_doesNotChangeImageWhenCellIsOutOfScreen() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsNotVisible(at: 0)
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertEqual(cell.renderedImageData, nil)
+    }
+    
+    func test_imageLoading_doesNotShowDataFromPreviousRequestAfterCellIsReused() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsVisible(at: 0)
+        cell.prepareForReuse()
+        
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertEqual(cell.renderedImageData, nil)
+    }
+    
+    func test_imageLoading_loadsCorrectImageForCellThatWasRedisplayed() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsNotVisible(at: 0)
+        sut.simulateCellIsRedisplayed(cell, at: 0)
+        
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertNotNil(cell.renderedImageData)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -447,8 +484,15 @@ private extension FeedViewController {
         return cell
     }
     
-    func simulateCellIsNotVisible(at index: Int) {
-        tableView.delegate?.tableView?(tableView, didEndDisplaying: itemCell(at: index)!, forRowAt: IndexPath(row: index, section: itemsSection))
+    @discardableResult
+    func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
+        let cell = simulateCellIsVisible(at: index)
+        tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
+        return cell
+    }
+    
+    func simulateCellIsRedisplayed(_ cell: FeedItemCell, at index: Int) {
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
     }
     
     func simulateManualFeedLoad() {

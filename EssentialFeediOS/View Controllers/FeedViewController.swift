@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol FeedViewControllerDelegate {
+    func didRequestFeedRefresh()
+}
+
 public class FeedViewController: UITableViewController {
     
     var models: [FeedCellController] = [] {
@@ -15,30 +19,15 @@ public class FeedViewController: UITableViewController {
         }
     }
     
-    private var refreshController: FeedRefreshViewController?
+    var delegate: FeedViewControllerDelegate?
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     
-    public override var refreshControl: UIRefreshControl? {
-        didSet {
-            refreshController?.view = refreshControl!
-        }
-    }
-    
-    convenience init(refreshController: FeedRefreshViewController) {
-        self.init()
-        self.refreshController = refreshController
-    }
-    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tableView.prefetchDataSource = self
-        
-        refreshControl = refreshController?.view
-        
+                
         onViewIsAppearing = { vc in
-            vc.refreshController?.load()
+            vc.refresh()
             vc.onViewIsAppearing = nil
         }
     }
@@ -51,6 +40,22 @@ public class FeedViewController: UITableViewController {
     private func cellController(at indexPath: IndexPath) -> FeedCellController {
         models[indexPath.row]
     }
+    
+    @IBAction private func refresh() {
+        delegate?.didRequestFeedRefresh()
+    }
+}
+
+// MARK: - FeedLoadingView
+
+extension FeedViewController: FeedLoadingView {
+    func display(_ viewModel: FeedLoadingViewModel) {
+        if viewModel.isLoading {
+            refreshControl?.beginRefreshing()
+        } else {
+            refreshControl?.endRefreshing()
+        }
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -61,7 +66,7 @@ extension FeedViewController {
     }
     
     public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        cellController(at: indexPath).view()
+        cellController(at: indexPath).view(in: tableView)
     }
 }
 
@@ -69,7 +74,7 @@ extension FeedViewController {
 
 extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cellController(at: indexPath).loadImage()
+        cellController(at: indexPath).loadImage(forCell: cell as? FeedItemCell)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {

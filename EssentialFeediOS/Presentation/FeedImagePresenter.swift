@@ -23,7 +23,7 @@ final class FeedImagePresenter<View: FeedImageView, Image> where View.Image == I
         self.imageTransformer = imageTransformer
     }
     
-    func initialCellDisplay(for model: FeedItem) {
+    func didDequeueCell(for model: FeedItem) {
         view.display(
             FeedImageViewModel(
                 description: model.description,
