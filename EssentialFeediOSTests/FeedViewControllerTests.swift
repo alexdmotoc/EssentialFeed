@@ -297,6 +297,19 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(cell.renderedImageData, nil)
     }
     
+    func test_imageLoading_loadsCorrectImageForCellThatWasRedisplayed() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
+        
+        let cell = sut.simulateCellIsNotVisible(at: 0)
+        sut.simulateCellIsRedisplayed(cell, at: 0)
+        
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        XCTAssertNotNil(cell.renderedImageData)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -476,6 +489,10 @@ private extension FeedViewController {
         let cell = simulateCellIsVisible(at: index)
         tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
         return cell
+    }
+    
+    func simulateCellIsRedisplayed(_ cell: FeedItemCell, at index: Int) {
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
     }
     
     func simulateManualFeedLoad() {

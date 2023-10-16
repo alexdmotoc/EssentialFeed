@@ -44,7 +44,8 @@ final class FeedCellController: FeedImageView {
         }
     }
     
-    func loadImage() {
+    func loadImage(forCell cell: FeedItemCell? = nil) {
+        captureCellReference(cell)
         delegate.didRequestImage()
     }
     
@@ -55,5 +56,9 @@ final class FeedCellController: FeedImageView {
     
     private func releaseCellReference() {
         cell = nil
+    }
+    
+    private func captureCellReference(_ cell: FeedItemCell?) {
+        if let cell { self.cell = cell }
     }
 }
