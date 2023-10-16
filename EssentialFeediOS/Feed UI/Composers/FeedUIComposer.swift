@@ -17,7 +17,11 @@ public enum FeedUIComposer {
             delegate: feedLoaderAdapter
         )
         
-        let feedAdapter = FeedAdapter(controller: feedController, imageLoader: imageLoader)
+        let feedAdapter = FeedAdapter(
+            controller: feedController,
+            imageLoader: MainQueueDispatchDecorator(imageLoader)
+        )
+        
         feedLoaderAdapter.presenter = FeedPresenter(
             feedLoadingView: WeakRefVirtualProxy(feedController),
             feedView: feedAdapter
