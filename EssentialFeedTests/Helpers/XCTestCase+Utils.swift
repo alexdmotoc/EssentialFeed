@@ -19,11 +19,15 @@ extension XCTestCase {
         }
     }
     
+    func uniqueImage() -> FeedItem {
+        FeedItem(id: UUID(), description: "any", location: "any", imageURL: URL(string: "some-url.com")!)
+    }
+    
     func uniqueImageFeed() -> (local: [LocalFeedImage], models: [FeedItem]) {
         let items = [
-            FeedItem(id: UUID(), description: "any", location: "any", imageURL: URL(string: "some-url.com")!),
-            FeedItem(id: UUID(), description: "any", location: "any", imageURL: URL(string: "some-url.com")!),
-            FeedItem(id: UUID(), description: "any", location: "any", imageURL: URL(string: "some-url.com")!)
+            uniqueImage(),
+            uniqueImage(),
+            uniqueImage()
         ]
         let local = items.map { LocalFeedImage(id: $0.id, description: $0.description, location: $0.location, url: $0.imageURL) }
         return (local, items)

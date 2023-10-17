@@ -6,12 +6,30 @@
 //
 
 import XCTest
+import EssentialFeed
 
-final class FeedImagePresenter {
-    private let view: Any
+protocol FeedImageView {
+    associatedtype Image
+    func display(_ viewModel: FeedImageViewModel<Image>)
+}
+
+final class FeedImagePresenter<View: FeedImageView> {
+    private let view: View
     
-    init(view: Any) {
+    init(view: View) {
         self.view = view
+    }
+    
+    func didDequeueCell(for model: FeedItem) {
+        view.display(
+            FeedImageViewModel(
+                description: model.description,
+                location: model.location,
+                image: nil,
+                isLoading: false,
+                isRetryHidden: true
+            )
+        )
     }
 }
 
@@ -23,9 +41,18 @@ final class FeedImagePresenterTests: XCTestCase {
         XCTAssertTrue(spy.messages.isEmpty)
     }
     
+    func test_didDequeueCell_sendsCorrectMessage() {
+        let (sut, spy) = makeSUT()
+        let item = uniqueImage()
+        
+        sut.didDequeueCell(for: item)
+        
+        XCTAssertEqual(spy.messages, [dequeueViewModel(for: item)])
+    }
+    
     // MARK: - Helpers
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedImagePresenter, spy: ViewSpy) {
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedImagePresenter<ViewSpy>, spy: ViewSpy) {
         let spy = ViewSpy()
         let sut = FeedImagePresenter(view: spy)
         checkIsDeallocated(sut: spy, file: file, line: line)
@@ -33,8 +60,27 @@ final class FeedImagePresenterTests: XCTestCase {
         return (sut, spy)
     }
     
-    private class ViewSpy {
-        private(set) var messages: [Any] = []
+    private func dequeueViewModel(for item: FeedItem) -> FeedImageViewModel<Data> {
+        .init(description: item.description, location: item.location, image: nil, isLoading: false, isRetryHidden: true)
     }
     
+    private class ViewSpy: FeedImageView {
+        typealias Image = Data
+        
+        private(set) var messages: [FeedImageViewModel<Data>] = []
+        
+        func display(_ viewModel: FeedImageViewModel<Data>) {
+            messages.append(viewModel)
+        }
+    }
+}
+
+extension FeedImageViewModel: Equatable where Image == Data {
+    static func == (lhs: FeedImageViewModel, rhs: FeedImageViewModel) -> Bool {
+        lhs.description == rhs.description &&
+        lhs.location == rhs.location &&
+        lhs.image == rhs.image &&
+        lhs.isLoading == rhs.isLoading &&
+        lhs.isRetryHidden == rhs.isRetryHidden
+    }
 }
