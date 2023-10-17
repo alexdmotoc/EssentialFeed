@@ -43,6 +43,18 @@ final class FeedImagePresenter<View: FeedImageView> {
             )
         )
     }
+    
+    func didEndLoadingImage(with error: Error, for model: FeedItem) {
+        view.display(
+            FeedImageViewModel(
+                description: model.description,
+                location: model.location,
+                image: nil,
+                isLoading: false,
+                isRetryHidden: false
+            )
+        )
+    }
 }
 
 final class FeedImagePresenterTests: XCTestCase {
@@ -71,6 +83,15 @@ final class FeedImagePresenterTests: XCTestCase {
         XCTAssertEqual(spy.messages, [loadingViewModel(for: item)])
     }
     
+    func test_didEndLoadingImageWithError_sendsCorrectMessage() {
+        let (sut, spy) = makeSUT()
+        let item = uniqueImage()
+        
+        sut.didEndLoadingImage(with: anyNSError(), for: item)
+        
+        XCTAssertEqual(spy.messages, [retryViewModel(for: item)])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedImagePresenter<ViewSpy>, spy: ViewSpy) {
@@ -87,6 +108,10 @@ final class FeedImagePresenterTests: XCTestCase {
     
     private func loadingViewModel(for item: FeedItem) -> FeedImageViewModel<Data> {
         .init(description: item.description, location: item.location, image: nil, isLoading: true, isRetryHidden: true)
+    }
+    
+    private func retryViewModel(for item: FeedItem) -> FeedImageViewModel<Data> {
+        .init(description: item.description, location: item.location, image: nil, isLoading: false, isRetryHidden: false)
     }
     
     private class ViewSpy: FeedImageView {
