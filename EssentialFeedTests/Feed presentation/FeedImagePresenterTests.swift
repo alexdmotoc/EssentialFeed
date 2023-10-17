@@ -65,6 +65,15 @@ final class FeedImagePresenter<View: FeedImageView, Image> where View.Image == I
             didEndLoadingImage(with: InvalidImageDataError(), for: model)
             return
         }
+        view.display(
+            FeedImageViewModel(
+                description: model.description,
+                location: model.location,
+                image: image,
+                isLoading: false,
+                isRetryHidden: true
+            )
+        )
     }
 }
 
@@ -103,13 +112,23 @@ final class FeedImagePresenterTests: XCTestCase {
         XCTAssertEqual(spy.messages, [retryViewModel(for: item)])
     }
     
-    func test_didEndLoadingImageSuccessfully_onInvalidDataConversion_sendsCorrectMessage() {
+    func test_didEndLoadingImageSuccessfully_onFailedImageDataConversion_sendsCorrectMessage() {
         let (sut, spy) = makeSUT(isFailingToConvert: true)
         let item = uniqueImage()
         
         sut.didEndLoadingImage(with: Data(), for: item)
         
         XCTAssertEqual(spy.messages, [retryViewModel(for: item)])
+    }
+    
+    func test_didEndLoadingImageSuccessfully_onSuccessfulImageDataConversion_sendsCorrectMessage() {
+        let (sut, spy) = makeSUT()
+        let item = uniqueImage()
+        let imageData = Data()
+        
+        sut.didEndLoadingImage(with: imageData, for: item)
+        
+        XCTAssertEqual(spy.messages, [loadedViewModel(for: item, image: imageData)])
     }
     
     // MARK: - Helpers
@@ -135,6 +154,10 @@ final class FeedImagePresenterTests: XCTestCase {
     
     private func retryViewModel(for item: FeedItem) -> FeedImageViewModel<Data> {
         .init(description: item.description, location: item.location, image: nil, isLoading: false, isRetryHidden: false)
+    }
+    
+    private func loadedViewModel(for item: FeedItem, image: Data) -> FeedImageViewModel<Data> {
+        .init(description: item.description, location: item.location, image: image, isLoading: false, isRetryHidden: true)
     }
     
     private class ViewSpy: FeedImageView {
