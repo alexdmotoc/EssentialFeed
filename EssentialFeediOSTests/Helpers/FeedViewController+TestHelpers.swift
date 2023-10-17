@@ -19,6 +19,10 @@ extension FeedViewController {
         tableView.numberOfRows(inSection: 0)
     }
     
+    var errorMessage: String? {
+        errorView.message
+    }
+    
     // MARK: - Initialization support
     
     func simulateAppearance() {

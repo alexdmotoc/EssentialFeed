@@ -13,6 +13,8 @@ protocol FeedViewControllerDelegate {
 
 public class FeedViewController: UITableViewController {
     
+    @IBOutlet private(set) public var errorView: ErrorView!
+    
     var models: [FeedCellController] = [] {
         didSet {
             tableView.reloadData()
@@ -55,6 +57,14 @@ extension FeedViewController: FeedLoadingView {
         } else {
             refreshControl?.endRefreshing()
         }
+    }
+}
+
+// MARK: - FeedErrorView
+
+extension FeedViewController: FeedErrorView {
+    func display(_ viewModel: FeedErrorViewModel) {
+        errorView.message = viewModel.message
     }
 }
 

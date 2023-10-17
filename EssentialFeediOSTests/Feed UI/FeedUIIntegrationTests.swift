@@ -346,6 +346,19 @@ final class FeedUIIntegrationTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
+    func test_feedLoading_showsErrorOnLoadError() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        XCTAssertEqual(sut.errorMessage, nil)
+        
+        loader.completeFeedLoadWithError(at: 0)
+        XCTAssertEqual(sut.errorMessage, localized("FEED_LOAD_ERROR"))
+        
+        sut.simulateManualFeedLoad()
+        XCTAssertEqual(sut.errorMessage, nil)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
