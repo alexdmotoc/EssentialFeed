@@ -19,6 +19,7 @@
 		87226D402ADDAA8100D13189 /* FeedAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226D3F2ADDAA8100D13189 /* FeedAdapter.swift */; };
 		87226D422ADDAA9E00D13189 /* FeedItemPresentationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226D412ADDAA9E00D13189 /* FeedItemPresentationAdapter.swift */; };
 		87226D442ADDAC8200D13189 /* MainQueueDispatchDecorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226D432ADDAC8200D13189 /* MainQueueDispatchDecorator.swift */; };
+		87226D4E2ADED29F00D13189 /* FeedPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226D4D2ADED29F00D13189 /* FeedPresenterTests.swift */; };
 		875D1FDB2A7A625E00B9210B /* XCTestCase+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FDA2A7A625E00B9210B /* XCTestCase+Utils.swift */; };
 		875D1FDD2A7A76C000B9210B /* URLSessionHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FDC2A7A76C000B9210B /* URLSessionHTTPClient.swift */; };
 		875D1FE52A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875D1FE42A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.swift */; };
@@ -136,6 +137,7 @@
 		87226D3F2ADDAA8100D13189 /* FeedAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedAdapter.swift; sourceTree = "<group>"; };
 		87226D412ADDAA9E00D13189 /* FeedItemPresentationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemPresentationAdapter.swift; sourceTree = "<group>"; };
 		87226D432ADDAC8200D13189 /* MainQueueDispatchDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainQueueDispatchDecorator.swift; sourceTree = "<group>"; };
+		87226D4D2ADED29F00D13189 /* FeedPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPresenterTests.swift; sourceTree = "<group>"; };
 		875D1FDA2A7A625E00B9210B /* XCTestCase+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utils.swift"; sourceTree = "<group>"; };
 		875D1FDC2A7A76C000B9210B /* URLSessionHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClient.swift; sourceTree = "<group>"; };
 		875D1FE22A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedAPIEndToEndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -255,6 +257,23 @@
 				87D530002AD6D73B0073AF4F /* FeedUIIntegrationTests.swift */,
 			);
 			path = "Feed UI";
+			sourceTree = "<group>";
+		};
+		87226D4B2ADED25700D13189 /* Feed API */ = {
+			isa = PBXGroup;
+			children = (
+				87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */,
+				87D5E7BC2A798E9900D6142E /* URLSessionHTTPClientTests.swift */,
+			);
+			path = "Feed API";
+			sourceTree = "<group>";
+		};
+		87226D4C2ADED27100D13189 /* Feed presentation */ = {
+			isa = PBXGroup;
+			children = (
+				87226D4D2ADED29F00D13189 /* FeedPresenterTests.swift */,
+			);
+			path = "Feed presentation";
 			sourceTree = "<group>";
 		};
 		875D1FD92A7A624800B9210B /* Helpers */ = {
@@ -418,8 +437,8 @@
 			children = (
 				875D1FD92A7A624800B9210B /* Helpers */,
 				878233B02AD43082004B1FC6 /* Feed cache */,
-				87D5E7A52A78492E00D6142E /* RemoteFeedLoaderTests.swift */,
-				87D5E7BC2A798E9900D6142E /* URLSessionHTTPClientTests.swift */,
+				87226D4B2ADED25700D13189 /* Feed API */,
+				87226D4C2ADED27100D13189 /* Feed presentation */,
 			);
 			path = EssentialFeedTests;
 			sourceTree = "<group>";
@@ -817,6 +836,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87226D4E2ADED29F00D13189 /* FeedPresenterTests.swift in Sources */,
 				87D5E7A62A78492E00D6142E /* RemoteFeedLoaderTests.swift in Sources */,
 				87D5E7BD2A798E9900D6142E /* URLSessionHTTPClientTests.swift in Sources */,
 				878233B72AD430F8004B1FC6 /* XCTestCase+FailableInsertFeedStoreSpecs.swift in Sources */,
