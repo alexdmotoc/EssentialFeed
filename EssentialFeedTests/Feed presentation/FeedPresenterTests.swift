@@ -25,6 +25,15 @@ final class FeedPresenter {
     private let feedView: FeedView
     private let errorView: FeedErrorView
     
+    static var title: String {
+        String(
+            localized: "FEED_VIEW_TITLE",
+            table: "Feed",
+            bundle: Bundle(for: FeedPresenter.self),
+            comment: "The title of the main screen"
+        )
+    }
+    
     private static var loadError: String {
         String(
             localized: "FEED_LOAD_ERROR",
@@ -57,7 +66,11 @@ final class FeedPresenter {
 }
 
 final class FeedPresenterTests: XCTestCase {
-
+    
+    func test_title_isLocalized() {
+        XCTAssertEqual(FeedPresenter.title, localized("FEED_VIEW_TITLE"))
+    }
+    
     func test_init_doesNotSendAnyMessages() {
         let (_, spy) = makeSUT()
         
