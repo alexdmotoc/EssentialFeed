@@ -55,15 +55,6 @@ final class FeedPresenterTests: XCTestCase {
         return (sut, spy)
     }
     
-    private func localized(_ key: String, file: StaticString = #filePath, line: UInt = #line) -> String {
-        let bundle = Bundle(for: FeedPresenter.self)
-        let localizedString = bundle.localizedString(forKey: key, value: nil, table: "Feed")
-        if localizedString == key {
-            XCTFail("Couldn't find a localized string for key \(key)", file: file, line: line)
-        }
-        return localizedString
-    }
-    
     private class ViewSpy: FeedLoadingView, FeedErrorView, FeedView {
         
         enum Message: Equatable {
