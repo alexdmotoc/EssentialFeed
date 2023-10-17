@@ -13,11 +13,13 @@ protocol FeedImageView {
     func display(_ viewModel: FeedImageViewModel<Image>)
 }
 
-final class FeedImagePresenter<View: FeedImageView> {
+final class FeedImagePresenter<View: FeedImageView, Image> where View.Image == Image {
     private let view: View
+    private let imageTransformer: (Data) -> Image?
     
-    init(view: View) {
+    init(view: View, imageTransformer: @escaping (Data) -> Image?) {
         self.view = view
+        self.imageTransformer = imageTransformer
     }
     
     func didDequeueCell(for model: FeedItem) {
@@ -54,6 +56,15 @@ final class FeedImagePresenter<View: FeedImageView> {
                 isRetryHidden: false
             )
         )
+    }
+    
+    private struct InvalidImageDataError: Error {}
+    
+    func didEndLoadingImage(with data: Data, for model: FeedItem) {
+        guard let image = imageTransformer(data) else {
+            didEndLoadingImage(with: InvalidImageDataError(), for: model)
+            return
+        }
     }
 }
 
@@ -92,11 +103,23 @@ final class FeedImagePresenterTests: XCTestCase {
         XCTAssertEqual(spy.messages, [retryViewModel(for: item)])
     }
     
+    func test_didEndLoadingImageSuccessfully_onInvalidDataConversion_sendsCorrectMessage() {
+        let (sut, spy) = makeSUT(isFailingToConvert: true)
+        let item = uniqueImage()
+        
+        sut.didEndLoadingImage(with: Data(), for: item)
+        
+        XCTAssertEqual(spy.messages, [retryViewModel(for: item)])
+    }
+    
     // MARK: - Helpers
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedImagePresenter<ViewSpy>, spy: ViewSpy) {
+    private func makeSUT(isFailingToConvert: Bool = false, file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedImagePresenter<ViewSpy, Data>, spy: ViewSpy) {
         let spy = ViewSpy()
-        let sut = FeedImagePresenter(view: spy)
+        let sut = FeedImagePresenter(
+            view: spy,
+            imageTransformer: isFailingToConvert ? { _ in nil} : { $0 }
+        )
         checkIsDeallocated(sut: spy, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, spy)
