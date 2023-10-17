@@ -1,0 +1,40 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "FEED_LOAD_ERROR" : {
+      "comment" : "Error message displayed when loading fails",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load feed"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu s-a putut incarca feedul"
+          }
+        }
+      }
+    },
+    "FEED_VIEW_TITLE" : {
+      "comment" : "The title of the main screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My feed"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedul meu"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
