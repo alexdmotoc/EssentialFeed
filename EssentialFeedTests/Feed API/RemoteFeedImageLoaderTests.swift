@@ -20,6 +20,10 @@ final class RemoteFeedImageDataLoader: FeedImageDataLoader {
         func cancel() {}
     }
     
+    enum Error: Swift.Error {
+        case connectivity, invalidData
+    }
+    
     private let client: HTTPClient
     
     init(client: HTTPClient) {
@@ -31,8 +35,8 @@ final class RemoteFeedImageDataLoader: FeedImageDataLoader {
             switch result {
             case .success:
                 break
-            case .failure(let error):
-                completion(.failure(error))
+            case .failure:
+                completion(.failure(Error.connectivity))
             }
         }
         return HTTPClientTaskWrapper(task)
@@ -68,21 +72,10 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
     
     func test_getData_returnsErrorOnClientError() {
         let (sut, client) = makeSUT()
-        let exp = expectation(description: "wait for request to complete")
-        let clientError = anyNSError()
         
-        _ = sut.load(from: anyURL()) { result in
-            switch result {
-            case .success:
-                XCTFail("Expected to complete with error got success")
-            case .failure(let error):
-                XCTAssertEqual(error as NSError, clientError)
-            }
-            exp.fulfill()
-        }
-        
-        client.complete(with: clientError)
-        wait(for: [exp], timeout: 1)
+        expect(sut, toCompleteWith: failure(.connectivity), when: {
+            client.complete(with: anyNSError())
+        })
     }
     
     // MARK: - Helpers
@@ -93,5 +86,34 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
         checkIsDeallocated(sut: client, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, client)
+    }
+    
+    private func failure(_ error: RemoteFeedImageDataLoader.Error) -> FeedImageDataLoader.Result {
+        .failure(error)
+    }
+    
+    private func expect(
+        _ sut: RemoteFeedImageDataLoader,
+        toCompleteWith expectedResult: FeedImageDataLoader.Result,
+        when action: () -> Void,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let exp = expectation(description: "wait for request to complete")
+        _ = sut.load(from: anyURL()) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case (.success(let receivedData), .success(let expectedData)):
+                XCTAssertEqual(receivedData, expectedData, file: file, line: line)
+            case (.failure(let receivedError as RemoteFeedImageDataLoader.Error), .failure(let expectedError as RemoteFeedImageDataLoader.Error)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+            case (.failure(let receivedError as NSError), .failure(let expectedError as NSError)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+            default:
+                XCTFail("Expected to receive \(expectedResult), received \(receivedResult)", file: file, line: line)
+            }
+            exp.fulfill()
+        }
+        action()
+        wait(for: [exp], timeout: 1)
     }
 }
