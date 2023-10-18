@@ -25,6 +25,59 @@ final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
         XCTAssertEqual(store.messages, [.retrieve(url: someURL)])
     }
     
+    func test_load_failsOnStoreError() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toLoadWith: loaderError(.failed), when: {
+            store.completeRetrieval(error: anyNSError())
+        })
+    }
+    
+    func test_load_failsWithNotFoundErrorOnStoreNotFound() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toLoadWith: loaderError(.notFound), when: {
+            store.completeRetrievalSuccessfully(data: .none)
+        })
+    }
+    
+    func test_load_deliversFoundDataOnStoreFoundData() {
+        let (sut, store) = makeSUT()
+        let someData = anyData()
+        
+        expect(sut, toLoadWith: .success(someData), when: {
+            store.completeRetrievalSuccessfully(data: someData)
+        })
+    }
+    
+    func test_load_doesNotDeliverResultAfterCancellingTask() {
+        let (sut, store) = makeSUT()
+        let foundData = anyData()
+
+        var received = [FeedImageDataLoader.Result]()
+        let task = sut.load(from: anyURL()) { received.append($0) }
+        task.cancel()
+
+        store.completeRetrievalSuccessfully(data: foundData)
+        store.completeRetrievalSuccessfully(data: nil)
+        store.completeRetrieval(error: anyNSError())
+
+        XCTAssertTrue(received.isEmpty, "Expected no received results after cancelling task")
+    }
+    
+    func test_load_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
+            let store = FeedImageDataStoreSpy()
+            var sut: LocalFeedImageDataLoader? = LocalFeedImageDataLoader(store: store)
+
+            var received = [FeedImageDataLoader.Result]()
+            _ = sut?.load(from: anyURL()) { received.append($0) }
+
+            sut = nil
+            store.completeRetrievalSuccessfully(data: anyData())
+
+            XCTAssertTrue(received.isEmpty, "Expected no received results after instance has been deallocated")
+        }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: LocalFeedImageDataLoader, store: FeedImageDataStoreSpy) {
@@ -35,13 +88,13 @@ final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
         return (sut, store)
     }
     
-    private func failed() -> LocalFeedImageDataLoader.SaveResult {
-        .failure(LocalFeedImageDataLoader.SaveError.failed)
+    private func loaderError(_ error: LocalFeedImageDataLoader.LoadError) -> LocalFeedImageDataLoader.LoadResult {
+        .failure(error)
     }
     
     private func expect(
         _ sut: LocalFeedImageDataLoader,
-        toLoadWith expectedResult: FeedImageDataLoader.Result,
+        toLoadWith expectedResult: LocalFeedImageDataLoader.LoadResult,
         when action: () -> Void,
         file: StaticString = #filePath,
         line: UInt = #line

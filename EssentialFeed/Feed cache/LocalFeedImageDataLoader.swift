@@ -42,15 +42,32 @@ extension LocalFeedImageDataLoader: FeedImageDataLoader {
     }
     
     private class LoadImageDataTask: FeedImageDataLoaderTask {
+        private var completion: ((LoadResult) -> Void)?
         
+        init(completion: @escaping (LoadResult) -> Void) {
+            self.completion = completion
+        }
+        
+        func complete(with result: LoadResult) {
+            completion?(result)
+        }
         
         func cancel() {
-            
+            completion = nil
         }
     }
     
     public func load(from url: URL, completion: @escaping (LoadResult) -> Void) -> FeedImageDataLoaderTask {
-        store.retrieve(dataForURL: url) { _ in }
-        return LoadImageDataTask()
+        let task = LoadImageDataTask(completion: completion)
+        store.retrieve(dataForURL: url) { [weak self] result in
+            guard self != nil else { return }
+            task.complete(with: result
+                .mapError { _ in LoadError.failed }
+                .flatMap { data in
+                    data.map { .success($0) } ?? .failure(LoadError.notFound)
+                }
+            )
+        }
+        return task
     }
 }
