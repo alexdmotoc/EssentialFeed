@@ -51,8 +51,7 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
     // MARK: - Helpers
     
     func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> LocalFeedLoader {
-        let bundle = Bundle(for: CoreDataFeedStore.self)
-        let store = try! CoreDataFeedStore(storeURL: storeURL(), bundle: bundle)
+        let store = try! CoreDataFeedStore(storeURL: storeURL())
         let sut = LocalFeedLoader(store: store, currentDate: Date.init)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return sut
