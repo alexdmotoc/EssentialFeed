@@ -40,4 +40,8 @@ extension XCTestCase {
     func anyURL() -> URL {
         .init(string: "https://some-url.com")!
     }
+    
+    func anyData() -> Data {
+        Data("any data".utf8)
+    }
 }
