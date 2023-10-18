@@ -15,6 +15,7 @@ public final class URLSessionHTTPClient: HTTPClient {
     }
     
     private struct LoadError: Error {}
+    
     private struct URLSessionTaskWrapper: HTTPClientTask {
         private let task: URLSessionTask
         
