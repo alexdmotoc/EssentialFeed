@@ -8,7 +8,7 @@
 import XCTest
 import EssentialFeed
 
-final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
+final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
 
     func test_init_doesNotMessageStore() {
         let (_, store) = makeSUT()
@@ -16,42 +16,13 @@ final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
         XCTAssertTrue(store.messages.isEmpty)
     }
     
-    func test_save_sendsSaveMessageToStore() {
+    func test_load_sendsLoadMessageToStore() {
         let (sut, store) = makeSUT()
-        let someData = anyData()
         let someURL = anyURL()
         
-        sut.save(someData, for: someURL) { _ in }
+        _ = sut.load(from: someURL) { _ in }
         
-        XCTAssertEqual(store.messages, [.insert(data: someData, url: someURL)])
-    }
-    
-    func test_save_failsOnInsertionError() {
-        let (sut, store) = makeSUT()
-        
-        expect(sut, toSaveWith: failed(), when: {
-            store.completeInsertion(error: anyNSError())
-        })
-    }
-    
-    func test_save_succeedsOnNoInsertionError() {
-        let (sut, store) = makeSUT()
-        
-        expect(sut, toSaveWith: .success(()), when: {
-            store.completeInsertionSuccessfully()
-        })
-    }
-    
-    func test_save_doesNotCompleteAfterItWasDeallocated() {
-        let store = FeedImageDataStoreSpy()
-        var sut: LocalFeedImageDataLoader? = LocalFeedImageDataLoader(store: store)
-        
-        var receivedResults: [LocalFeedImageDataLoader.SaveResult] = []
-        sut?.save(anyData(), for: anyURL()) { receivedResults.append($0) }
-        sut = nil
-        store.completeInsertionSuccessfully()
-        
-        XCTAssertTrue(receivedResults.isEmpty)
+        XCTAssertEqual(store.messages, [.retrieve(url: someURL)])
     }
     
     // MARK: - Helpers
@@ -70,17 +41,17 @@ final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
     
     private func expect(
         _ sut: LocalFeedImageDataLoader,
-        toSaveWith expectedResult: LocalFeedImageDataLoader.SaveResult,
+        toLoadWith expectedResult: FeedImageDataLoader.Result,
         when action: () -> Void,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        let exp = expectation(description: "wait for save")
-        sut.save(anyData(), for: anyURL()) { receivedResult in
+        let exp = expectation(description: "wait for load")
+        _ = sut.load(from: anyURL()) { receivedResult in
             switch (expectedResult, receivedResult) {
-            case (.success, .success):
-                break
-            case (.failure(let expectedError as LocalFeedImageDataLoader.SaveError), .failure(let receivedError as LocalFeedImageDataLoader.SaveError)):
+            case (.success(let expectedData), .success(let receivedData)):
+                XCTAssertEqual(expectedData, receivedData, file: file, line: line)
+            case (.failure(let expectedError as LocalFeedImageDataLoader.LoadError), .failure(let receivedError as LocalFeedImageDataLoader.LoadError)):
                 XCTAssertEqual(expectedError, receivedError, file: file, line: line)
             case (.failure(let expectedError as NSError), .failure(let receivedError as NSError)):
                 XCTAssertEqual(expectedError, receivedError, file: file, line: line)
