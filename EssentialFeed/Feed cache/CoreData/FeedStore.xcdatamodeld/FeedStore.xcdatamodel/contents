@@ -6,6 +6,7 @@
     </entity>
     <entity name="FeedItemMO" representedClassName="FeedItemMO" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="imageURL" attributeType="URI"/>
         <attribute name="itemDescription" optional="YES" attributeType="String"/>
         <attribute name="location" optional="YES" attributeType="String"/>
