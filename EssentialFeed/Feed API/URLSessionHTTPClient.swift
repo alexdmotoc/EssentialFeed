@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class URLSessionHTTPClient: HTTPClient {
+public final class URLSessionHTTPClient: HTTPClient {
     private let session: URLSession
     
     public init(session: URLSession = .shared) {
@@ -16,8 +16,20 @@ public class URLSessionHTTPClient: HTTPClient {
     
     private struct LoadError: Error {}
     
-    public func get(url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
-        session.dataTask(with: url) { data, response, error in
+    private struct URLSessionTaskWrapper: HTTPClientTask {
+        private let task: URLSessionTask
+        
+        init(_ task: URLSessionTask) {
+            self.task = task
+        }
+        
+        func cancel() {
+            task.cancel()
+        }
+    }
+    
+    public func get(url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
+        let task = session.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(error))
             } else if let data, let response = response as? HTTPURLResponse {
@@ -25,6 +37,8 @@ public class URLSessionHTTPClient: HTTPClient {
             } else {
                 completion(.failure(LoadError()))
             }
-        }.resume()
+        }
+        task.resume()
+        return URLSessionTaskWrapper(task)
     }
 }

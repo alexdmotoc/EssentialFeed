@@ -36,4 +36,12 @@ extension XCTestCase {
     func anyNSError() -> NSError {
         NSError(domain: "com.tests.mockError", code: 0)
     }
+    
+    func anyURL() -> URL {
+        .init(string: "https://some-url.com")!
+    }
+    
+    func anyData() -> Data {
+        Data("any data".utf8)
+    }
 }
