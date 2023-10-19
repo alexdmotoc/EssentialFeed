@@ -39,8 +39,8 @@ final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> FeedLoaderWithFallbackComposite {
-        let primary = LoaderStub(stub: primaryStub)
-        let fallback = LoaderStub(stub: fallbackStub)
+        let primary = FeedLoaderStub(stub: primaryStub)
+        let fallback = FeedLoaderStub(stub: fallbackStub)
         let sut = FeedLoaderWithFallbackComposite(primary: primary, fallback: fallback)
         checkIsDeallocated(sut: primary, file: file, line: line)
         checkIsDeallocated(sut: fallback, file: file, line: line)
@@ -69,17 +69,5 @@ final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
         }
         
         wait(for: [exp], timeout: 1)
-    }
-    
-    private class LoaderStub: FeedLoader {
-        private let stub: FeedLoader.Result
-        
-        init(stub: FeedLoader.Result) {
-            self.stub = stub
-        }
-        
-        func load(completion: @escaping (FeedLoader.Result) -> Void) {
-            completion(stub)
-        }
     }
 }
