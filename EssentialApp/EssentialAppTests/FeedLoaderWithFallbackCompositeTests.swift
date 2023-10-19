@@ -26,11 +26,8 @@ final class FeedLoaderWithFallbackComposite: FeedLoader {
 final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
 
     func test_load_deliversResultsFromPrimaryOnSuccess() {
-        let primaryFeed = uniqueFeed
-        let fallbackFeed = uniqueFeed
-        let primary = LoaderStub(stub: .success(primaryFeed))
-        let fallback = LoaderStub(stub: .success(fallbackFeed))
-        let sut = FeedLoaderWithFallbackComposite(primary: primary, fallback: fallback)
+        let primaryFeed = uniqueImageFeed().models
+        let sut = makeSUT(primaryStub: .success(primaryFeed), fallbackStub: .success(uniqueImageFeed().models))
         
         let exp = expectation(description: "wait for load")
         
@@ -49,10 +46,19 @@ final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private var uniqueFeed: [FeedItem] {
-        [
-            FeedItem(id: UUID(), description: "some desc", location: "some loc", imageURL: URL(string: "some-url.com")!)
-        ]
+    private func makeSUT(
+        primaryStub: FeedLoader.Result,
+        fallbackStub: FeedLoader.Result,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> FeedLoaderWithFallbackComposite {
+        let primary = LoaderStub(stub: primaryStub)
+        let fallback = LoaderStub(stub: fallbackStub)
+        let sut = FeedLoaderWithFallbackComposite(primary: primary, fallback: fallback)
+        checkIsDeallocated(sut: primary, file: file, line: line)
+        checkIsDeallocated(sut: fallback, file: file, line: line)
+        checkIsDeallocated(sut: sut, file: file, line: line)
+        return sut
     }
     
     private class LoaderStub: FeedLoader {
