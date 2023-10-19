@@ -36,38 +36,14 @@ final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
         let primaryFeed = uniqueImageFeed().models
         let sut = makeSUT(primaryStub: .success(primaryFeed), fallbackStub: .success(uniqueImageFeed().models))
         
-        let exp = expectation(description: "wait for load")
-        
-        sut.load { result in
-            switch result {
-            case .success(let items):
-                XCTAssertEqual(items, primaryFeed)
-            case .failure(let error):
-                XCTFail("Expected success, got \(error)")
-            }
-            exp.fulfill()
-        }
-        
-        wait(for: [exp], timeout: 1)
+        expect(sut, toCompleteWith: .success(primaryFeed))
     }
     
     func test_load_deliversResultsFromFallabackOnPrimaryFailure() {
         let fallbackFeed = uniqueImageFeed().models
         let sut = makeSUT(primaryStub: .failure(anyNSError()), fallbackStub: .success(fallbackFeed))
         
-        let exp = expectation(description: "wait for load")
-        
-        sut.load { result in
-            switch result {
-            case .success(let items):
-                XCTAssertEqual(items, fallbackFeed)
-            case .failure(let error):
-                XCTFail("Expected success, got \(error)")
-            }
-            exp.fulfill()
-        }
-        
-        wait(for: [exp], timeout: 1)
+        expect(sut, toCompleteWith: .success(fallbackFeed))
     }
     
     // MARK: - Helpers
@@ -85,6 +61,29 @@ final class FeedLoaderWithFallbackCompositeTests: XCTestCase {
         checkIsDeallocated(sut: fallback, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return sut
+    }
+    
+    private func expect(
+        _ sut: FeedLoaderWithFallbackComposite,
+        toCompleteWith expectedResult: FeedLoader.Result,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let exp = expectation(description: "wait for load")
+        
+        sut.load { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case (.success(let receivedItems), .success(let expectedItems)):
+                XCTAssertEqual(receivedItems, expectedItems, file: file, line: line)
+            case (.failure(let receivedError), .failure(let expectedError)):
+                XCTAssertEqual(receivedError as NSError, expectedError as NSError, file: file, line: line)
+            default:
+                XCTFail("Expected \(expectedResult), got \(receivedResult)", file: file, line: line)
+            }
+            exp.fulfill()
+        }
+        
+        wait(for: [exp], timeout: 1)
     }
     
     private class LoaderStub: FeedLoader {
