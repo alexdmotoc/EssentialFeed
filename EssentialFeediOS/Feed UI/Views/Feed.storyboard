@@ -14,7 +14,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="9bW-2O-IZ7">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="XXy-kn-fKf" customClass="ErrorView" customModule="EssentialFeediOS" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="393" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -70,10 +70,10 @@
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Y9-Tk-IxC">
                                                     <rect key="frame" x="0.0" y="50.666666666666657" width="353" height="353"/>
                                                     <subviews>
-                                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hBR-Ca-IGo">
+                                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hBR-Ca-IGo">
                                                             <rect key="frame" x="0.0" y="0.0" width="353" height="353"/>
                                                             <constraints>
-                                                                <constraint firstAttribute="width" secondItem="hBR-Ca-IGo" secondAttribute="height" multiplier="1:1" id="jqX-nU-DpP"/>
+                                                                <constraint firstAttribute="width" secondItem="hBR-Ca-IGo" secondAttribute="height" multiplier="1:1" priority="999" id="jqX-nU-DpP"/>
                                                             </constraints>
                                                         </imageView>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZzN-Cs-obU">
@@ -111,11 +111,9 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstItem="hBR-Ca-IGo" firstAttribute="width" secondItem="cqx-dq-2rd" secondAttribute="width" id="hKM-dO-tqh"/>
-                                            </constraints>
                                         </stackView>
                                     </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstItem="cqx-dq-2rd" firstAttribute="leading" secondItem="5cx-Kq-428" secondAttribute="leadingMargin" id="87C-vr-Pj3"/>
                                         <constraint firstItem="cqx-dq-2rd" firstAttribute="top" secondItem="5cx-Kq-428" secondAttribute="topMargin" id="Jwu-4R-bwn"/>
@@ -123,6 +121,7 @@
                                         <constraint firstAttribute="trailingMargin" secondItem="cqx-dq-2rd" secondAttribute="trailing" id="l22-v6-2SZ"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="descriptionLabel" destination="ZXq-6P-lyI" id="yLW-ea-Zdt"/>
                                     <outlet property="feedImageContainer" destination="2Y9-Tk-IxC" id="UlD-YZ-Nl2"/>
@@ -157,9 +156,6 @@
     </scenes>
     <resources>
         <image name="mappin.and.ellipse" catalog="system" width="110" height="128"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="systemGray3Color">
             <color red="0.7803921568627451" green="0.7803921568627451" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
@@ -168,6 +164,9 @@
         </systemColor>
         <systemColor name="systemGray5Color">
             <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemGroupedBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

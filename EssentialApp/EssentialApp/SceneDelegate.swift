@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import EssentialFeediOS
+import EssentialFeed
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -13,10 +16,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        
+        let storeURL = NSPersistentContainer.defaultDirectoryURL().appending(path: "feed-store.sqlite")
+        let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
+        let client = URLSessionHTTPClient()
+        let feedStore = try! CoreDataFeedStore(storeURL: storeURL)
+        
+        let remoteFeedLoader = RemoteFeedLoader(client: client, url: baseURL)
+        let localFeedLoader = LocalFeedLoader(store: feedStore, currentDate: Date.init)
+        
+        let remoteFeedImageLoader = RemoteFeedImageDataLoader(client: client)
+        let localFeedImageLoader = LocalFeedImageDataLoader(store: feedStore)
+        
+        window?.rootViewController = FeedUIComposer.makeFeedController(
+            with: FeedLoaderWithFallbackComposite(
+                primary: remoteFeedLoader,
+                fallback: localFeedLoader
+            ),
+            imageLoader: FeedImageDataLoaderWithFallbackComposite(
+                primary: localFeedImageLoader,
+                fallback: remoteFeedImageLoader
+            )
+        )
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
