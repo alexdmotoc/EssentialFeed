@@ -18,6 +18,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let _ = (scene as? UIWindowScene) else { return }
         
+        if CommandLine.arguments.contains("-reset") {
+            try? FileManager.default.removeItem(at: storeURL)
+        }
+        
         let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
         let client = makeClient()
         let feedStore = try! CoreDataFeedStore(storeURL: storeURL)
