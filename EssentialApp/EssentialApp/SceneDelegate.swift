@@ -48,7 +48,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func makeClient() -> HTTPClient {
         if let connectivity = UserDefaults.standard.string(forKey: "connectivity") {
-            return DebugHTTPClient()
+            return DebugHTTPClient(connectivity: connectivity)
         }
         return URLSessionHTTPClient()
     }
@@ -59,9 +59,54 @@ private class DebugHTTPClient: HTTPClient {
         func cancel() {}
     }
     
+    private let connectivity: String
+    
+    init(connectivity: String) {
+        self.connectivity = connectivity
+    }
+    
     func get(url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
-        completion(.failure(NSError(domain: "debug error", code: 0)))
+        switch connectivity {
+        case "online":
+            completion(.success(makeGetResponse(for: url)))
+        default:
+            completion(.failure(NSError(domain: "debug error", code: 0)))
+        }
         return Task()
+    }
+    
+    private func makeGetResponse(for url: URL) -> (HTTPURLResponse, Data) {
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        return (response, makeData(for: url))
+    }
+    
+    private func makeData(for url: URL) -> Data {
+        switch url.absoluteString {
+        case "http://image.com":
+            return makeImageData()
+        default:
+            return makeFeedData()
+        }
+    }
+    
+    private func makeImageData() -> Data {
+        let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        
+        let image = UIGraphicsImageRenderer(size: rect.size, format: format).image { rendererContext in
+            UIColor.red.setFill()
+            rendererContext.fill(rect)
+        }
+        
+        return image.pngData()!
+    }
+    
+    private func makeFeedData() -> Data {
+        return try! JSONSerialization.data(withJSONObject: ["items": [
+            ["id": UUID().uuidString, "image": "http://image.com"],
+            ["id": UUID().uuidString, "image": "http://image.com"]
+        ]])
     }
 }
 
