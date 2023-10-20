@@ -37,6 +37,14 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase, FeedImageDataLoa
         })
     }
     
+    func test_load_deliversErrorOnFailure() {
+        let (sut, spy) = makeSUT()
+        
+        expect(sut, toCompleteWith: .failure(anyNSError()), when: {
+            spy.complete(error: anyNSError())
+        })
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(
