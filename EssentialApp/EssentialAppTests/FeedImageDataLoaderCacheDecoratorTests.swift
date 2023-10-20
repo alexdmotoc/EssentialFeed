@@ -28,6 +28,15 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         XCTAssertTrue(spy.requestedURLs.isEmpty)
     }
     
+    func test_load_deliversDataOnSuccess() {
+        let (sut, spy) = makeSUT()
+        let imageData = anyData()
+        
+        expect(sut, toCompleteWith: .success(imageData), when: {
+            spy.complete(data: imageData)
+        })
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(
@@ -42,5 +51,31 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         checkIsDeallocated(sut: spy, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, spy)
+    }
+    
+    private func expect(
+        _ sut: FeedImageDataLoader,
+        toCompleteWith expectedResult: FeedImageDataLoader.Result,
+        when action: () -> Void,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let exp = expectation(description: "wait for load")
+        
+        _ = sut.load(from: anyURL()) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case (.success(let receivedData), .success(let expectedData)):
+                XCTAssertEqual(receivedData, expectedData, file: file, line: line)
+            case (.failure(let receivedError), .failure(let expectedError)):
+                XCTAssertEqual(receivedError as NSError, expectedError as NSError, file: file, line: line)
+            default:
+                XCTFail("Expected \(expectedResult), got \(receivedResult)", file: file, line: line)
+            }
+            exp.fulfill()
+        }
+        
+        action()
+        
+        wait(for: [exp], timeout: 1)
     }
 }

@@ -110,7 +110,7 @@ final class FeedImageDataLoaderWithFallbackCompositeTests: XCTestCase {
     }
     
     private func expect(
-        _ sut: FeedImageDataLoaderWithFallbackComposite,
+        _ sut: FeedImageDataLoader,
         toCompleteWith expectedResult: FeedImageDataLoader.Result,
         when action: () -> Void,
         file: StaticString = #filePath,
