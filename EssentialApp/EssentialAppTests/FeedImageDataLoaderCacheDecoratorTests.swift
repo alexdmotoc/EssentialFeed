@@ -35,39 +35,12 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         line: UInt = #line
     ) -> (
         sut: FeedImageDataLoaderCacheDecorator,
-        spy: LoaderSpy
+        spy: FeedImageDataLoaderSpy
     ) {
-        let spy = LoaderSpy()
+        let spy = FeedImageDataLoaderSpy()
         let sut = FeedImageDataLoaderCacheDecorator(decoratee: spy)
         checkIsDeallocated(sut: spy, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, spy)
-    }
-    
-    private class LoaderSpy: FeedImageDataLoader {
-        
-        private struct Task: FeedImageDataLoaderTask {
-            let callback: () -> Void
-            func cancel() {
-                callback()
-            }
-        }
-        
-        private(set) var cancelledURLs: [URL] = []
-        private var messages: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
-        var requestedURLs: [URL] { messages.map(\.url)}
-        
-        func load(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-            messages.append((url, completion))
-            return Task { [weak self] in self?.cancelledURLs.append(url) }
-        }
-        
-        func complete(error: Error, at index: Int = 0) {
-            messages[index].completion(.failure(error))
-        }
-        
-        func complete(data: Data, at index: Int = 0) {
-            messages[index].completion(.success(data))
-        }
     }
 }
