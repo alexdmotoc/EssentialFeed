@@ -1,0 +1,33 @@
+{
+  "configurations" : [
+    {
+      "id" : "907E1134-3238-48A4-97FD-B54A266ACEF5",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:EssentialApp.xcodeproj",
+          "identifier" : "87226DB82ADF0A8B00D13189",
+          "name" : "EssentialApp"
+        }
+      ]
+    },
+    "testExecutionOrdering" : "random"
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:EssentialApp.xcodeproj",
+        "identifier" : "87226DCE2ADF0A8C00D13189",
+        "name" : "EssentialAppTests"
+      }
+    }
+  ],
+  "version" : 1
+}
