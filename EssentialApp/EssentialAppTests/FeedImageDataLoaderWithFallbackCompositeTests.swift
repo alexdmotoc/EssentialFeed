@@ -9,7 +9,7 @@ import XCTest
 import EssentialApp
 import EssentialFeed
 
-final class FeedImageDataLoaderWithFallbackCompositeTests: XCTestCase {
+final class FeedImageDataLoaderWithFallbackCompositeTests: XCTestCase, FeedImageDataLoaderTests {
     
     func test_init_doesNotMessagePrimaryNorFallback() {
         let (_, primary, fallback) = makeSUT()
@@ -107,31 +107,5 @@ final class FeedImageDataLoaderWithFallbackCompositeTests: XCTestCase {
         checkIsDeallocated(sut: fallback, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, primary, fallback)
-    }
-    
-    private func expect(
-        _ sut: FeedImageDataLoader,
-        toCompleteWith expectedResult: FeedImageDataLoader.Result,
-        when action: () -> Void,
-        file: StaticString = #filePath,
-        line: UInt = #line
-    ) {
-        let exp = expectation(description: "wait for load")
-        
-        _ = sut.load(from: anyURL()) { receivedResult in
-            switch (receivedResult, expectedResult) {
-            case (.success(let receivedData), .success(let expectedData)):
-                XCTAssertEqual(receivedData, expectedData, file: file, line: line)
-            case (.failure(let receivedError), .failure(let expectedError)):
-                XCTAssertEqual(receivedError as NSError, expectedError as NSError, file: file, line: line)
-            default:
-                XCTFail("Expected \(expectedResult), got \(receivedResult)", file: file, line: line)
-            }
-            exp.fulfill()
-        }
-        
-        action()
-        
-        wait(for: [exp], timeout: 1)
     }
 }
