@@ -18,6 +18,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let _ = (scene as? UIWindowScene) else { return }
         
+        configureWindow()
+    }
+    
+    func configureWindow() {
         let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
         let client = makeClient()
         let feedStore = try! CoreDataFeedStore(storeURL: storeURL)
@@ -30,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let localFeedImageLoader = LocalFeedImageDataLoader(store: feedStore)
         let feedImageLoaderWithCache = FeedImageDataLoaderCacheDecorator(decoratee: remoteFeedImageLoader, cache: localFeedImageLoader)
         
-        window?.rootViewController = FeedUIComposer.makeFeedController(
+        let feedController = FeedUIComposer.makeFeedController(
             with: FeedLoaderWithFallbackComposite(
                 primary: feedLoaderWithCache,
                 fallback: localFeedLoader
@@ -40,6 +44,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 fallback: feedImageLoaderWithCache
             )
         )
+        
+        window?.rootViewController = UINavigationController(rootViewController: feedController)
     }
     
     func makeClient() -> HTTPClient {
