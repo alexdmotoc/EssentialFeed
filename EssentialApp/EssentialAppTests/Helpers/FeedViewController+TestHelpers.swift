@@ -16,7 +16,7 @@ extension FeedViewController {
     }
     
     var numberOfRenderedImages: Int {
-        tableView.numberOfRows(inSection: 0)
+        tableView.numberOfRows(inSection: itemsSection)
     }
     
     var errorMessage: String? {
@@ -56,6 +56,7 @@ extension FeedViewController {
     var itemsSection: Int { 0 }
     
     func itemCell(at index: Int) -> FeedItemCell? {
+        guard index < numberOfRenderedImages else { return nil }
         let dataSource = tableView.dataSource
         return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: itemsSection)) as? FeedItemCell
     }
@@ -89,6 +90,10 @@ extension FeedViewController {
     func simulateCancelCellPreload(at index: Int) {
         simulateCellPreload(at: index)
         tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: itemsSection)])
+    }
+    
+    func renderedImageData(at index: Int) -> Data? {
+        simulateCellIsVisible(at: index).renderedImageData
     }
     
     private class UIRefreshControlSpy: UIRefreshControl {
