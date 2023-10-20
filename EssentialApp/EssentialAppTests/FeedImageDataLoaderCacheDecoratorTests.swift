@@ -81,6 +81,16 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase, FeedImageDataLoa
         XCTAssertEqual(cache.messages, [])
     }
     
+    func test_cancelLoad_cancelsLoadOperation() {
+        let (sut, spy) = makeSUT()
+        let loadURL = anyURL()
+        
+        let task = sut.load(from: loadURL) { _ in }
+        task.cancel()
+        
+        XCTAssertEqual(spy.cancelledURLs, [loadURL])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(
