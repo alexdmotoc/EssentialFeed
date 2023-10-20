@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     
-    private(set) lazy var storeURL = NSPersistentContainer
+    private lazy var storeURL = NSPersistentContainer
         .defaultDirectoryURL()
         .appending(path: "feed-store.sqlite")
     
@@ -67,10 +67,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneWillResignActive(_ scene: UIScene) {
         localFeedLoader.validateCache { _ in }
-    }
-    
-    func makeClient() -> HTTPClient {
-        URLSessionHTTPClient()
     }
 }
 
