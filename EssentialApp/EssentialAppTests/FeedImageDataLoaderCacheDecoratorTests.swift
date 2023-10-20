@@ -8,15 +8,28 @@
 import XCTest
 import EssentialFeed
 
+protocol FeedImageDataCache {
+    typealias SaveResult = Result<Void, Error>
+    
+    func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void)
+}
+
 final class FeedImageDataLoaderCacheDecorator: FeedImageDataLoader {
     private let decoratee: FeedImageDataLoader
+    private let cache: FeedImageDataCache
     
-    init(decoratee: FeedImageDataLoader) {
+    init(decoratee: FeedImageDataLoader, cache: FeedImageDataCache) {
         self.decoratee = decoratee
+        self.cache = cache
     }
     
     func load(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-        decoratee.load(from: url, completion: completion)
+        decoratee.load(from: url) { [weak self] result in
+            completion(result.map { data in
+                self?.cache.save(data, for: url) { _ in }
+                return data
+            })
+        }
     }
 }
 
@@ -45,9 +58,22 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase, FeedImageDataLoa
         })
     }
     
+    func test_load_savesDataToCacheOnSuccess() {
+        let cache = CacheSpy()
+        let (sut, spy) = makeSUT(cache: cache)
+        let imageData = anyData()
+        let loadURL = anyURL()
+        
+        _ = sut.load(from: loadURL) { _ in }
+        spy.complete(data: imageData)
+        
+        XCTAssertEqual(cache.messages, [.save(imageData, loadURL)])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(
+        cache: CacheSpy = .init(),
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> (
@@ -55,9 +81,21 @@ final class FeedImageDataLoaderCacheDecoratorTests: XCTestCase, FeedImageDataLoa
         spy: FeedImageDataLoaderSpy
     ) {
         let spy = FeedImageDataLoaderSpy()
-        let sut = FeedImageDataLoaderCacheDecorator(decoratee: spy)
+        let sut = FeedImageDataLoaderCacheDecorator(decoratee: spy, cache: cache)
         checkIsDeallocated(sut: spy, file: file, line: line)
+        checkIsDeallocated(sut: cache, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, spy)
+    }
+    
+    private class CacheSpy: FeedImageDataCache {
+        enum Message: Equatable {
+            case save(Data, URL)
+        }
+        private(set) var messages: [Message] = []
+        
+        func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
+            messages.append(.save(data, url))
+        }
     }
 }
