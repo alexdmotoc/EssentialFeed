@@ -29,6 +29,15 @@ final class FeedSnapshotTests: XCTestCase {
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_CONTENT_dark")
     }
     
+    func test_feedWithError() {
+        let sut = makeSUT()
+        
+        sut.display(.error(message: "This is a\nmulti-line\nerror message"))
+        
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_ERROR_light")
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_ERROR_dark")
+    }
+    
     // MARK: - Helpers
     private func makeSUT() -> FeedViewController {
         let bundle = Bundle(for: FeedViewController.self)
