@@ -38,6 +38,15 @@ final class FeedSnapshotTests: XCTestCase {
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_ERROR_dark")
     }
     
+    func test_feedWithImageLoadError() {
+        let sut = makeSUT()
+        
+        sut.display(feedWithImageLoadError())
+        
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_IMAGE_LOAD_ERROR_light")
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark")
+    }
+    
     // MARK: - Helpers
     private func makeSUT() -> FeedViewController {
         let bundle = Bundle(for: FeedViewController.self)
@@ -64,6 +73,21 @@ final class FeedSnapshotTests: XCTestCase {
                 description: "Garth Pier is a Grade II listed structure in Bangor, Gwynedd, North Wales.",
                 location: "Garth Pier",
                 image: UIImage.make(withColor: .green)
+            )
+        ]
+    }
+    
+    private func feedWithImageLoadError() -> [ImageStub] {
+        [
+            ImageStub(
+                description: "The East Side Gallery is an open-air gallery in Berlin. It consists of a series of murals painted directly...",
+                location: "East Side Gallery\nMemorial in Berlin, Germany",
+                image: nil
+            ),
+            ImageStub(
+                description: "Garth Pier is a Grade II listed structure in Bangor, Gwynedd, North Wales.",
+                location: "Garth Pier",
+                image: nil
             )
         ]
     }
