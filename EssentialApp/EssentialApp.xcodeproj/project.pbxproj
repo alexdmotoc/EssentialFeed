@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8718AA992AE4377D00908699 /* UIView+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8718AA982AE4377D00908699 /* UIView+TestHelpers.swift */; };
 		87226DBD2ADF0A8B00D13189 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226DBC2ADF0A8B00D13189 /* AppDelegate.swift */; };
 		87226DBF2ADF0A8B00D13189 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226DBE2ADF0A8B00D13189 /* SceneDelegate.swift */; };
 		87226DC12ADF0A8B00D13189 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87226DC02ADF0A8B00D13189 /* ViewController.swift */; };
@@ -76,6 +77,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8718AA982AE4377D00908699 /* UIView+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+TestHelpers.swift"; sourceTree = "<group>"; };
 		87226DB92ADF0A8B00D13189 /* EssentialApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EssentialApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		87226DBC2ADF0A8B00D13189 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		87226DBE2ADF0A8B00D13189 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 				873E05C12AE29AC500F60EBE /* FeedImageDataLoaderSpy.swift */,
 				87E80E692AE2EDA800C3EE50 /* HTTPClientStub.swift */,
 				87E80E6B2AE2EE4300C3EE50 /* InMemoryFeedStore.swift */,
+				8718AA982AE4377D00908699 /* UIView+TestHelpers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 				87E80E562AE2E84300C3EE50 /* FeedUIIntegrationTests.swift in Sources */,
 				87A5FC4E2AE196DD0087C621 /* XCTestCase+FeedLoader.swift in Sources */,
 				873E05C42AE29B8C00F60EBE /* XCTestCase+FeedImageDataLoader.swift in Sources */,
+				8718AA992AE4377D00908699 /* UIView+TestHelpers.swift in Sources */,
 				87226DD42ADF0A8C00D13189 /* FeedLoaderWithFallbackCompositeTests.swift in Sources */,
 				87A5FC3E2AE16DF00087C621 /* FeedImageDataLoaderWithFallbackCompositeTests.swift in Sources */,
 				87E80E622AE2E85B00C3EE50 /* UIRefreshControl+TestHelpers.swift in Sources */,

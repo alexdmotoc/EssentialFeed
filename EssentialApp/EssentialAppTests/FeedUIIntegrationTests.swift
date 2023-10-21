@@ -86,6 +86,21 @@ final class FeedUIIntegrationTests: XCTestCase {
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
     
+    func test_loadFeed_rendersEmptyFeedCorrectlyAfterPreviouslyRenderingImages() throws {
+        let image1 = makeImage()
+        let image2 = makeImage()
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        try assertThat(sut, isRendering: [image1, image2])
+        
+        sut.simulateManualFeedLoad()
+        loader.completeFeedLoad(withFeed: [], at: 1)
+        try assertThat(sut, isRendering: [])
+    }
+    
     func test_loadFeed_doesNotAlterRenderingOnError() throws {
         let image1 = makeImage(description: nil, location: nil)
         let (sut, loader) = makeSUT()
@@ -376,11 +391,15 @@ final class FeedUIIntegrationTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) throws {
+        sut.view.enforceLayout()
+        
         XCTAssertEqual(sut.numberOfRenderedImages, images.count)
         
         try images.enumerated().forEach { index, element in
             try assertThat(sut, isRendering: element, at: index, file: file, line: line)
         }
+        
+        executeRunLoopToCleanUpReferences()
     }
     
     private func assertThat(
@@ -399,5 +418,9 @@ final class FeedUIIntegrationTests: XCTestCase {
     
     private func makeImage(description: String? = nil, location: String? = nil, url: URL = URL(string: "someUrl.com")!) -> FeedItem {
         FeedItem(id: UUID(), description: description, location: location, imageURL: url)
+    }
+    
+    private func executeRunLoopToCleanUpReferences() {
+        RunLoop.current.run(until: Date())
     }
 }
