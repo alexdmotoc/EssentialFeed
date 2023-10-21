@@ -16,7 +16,7 @@ public class FeedViewController: UITableViewController {
     
     @IBOutlet private(set) public var errorView: ErrorView!
     
-    public var models: [FeedCellController] = [] {
+    private var models: [FeedCellController] = [] {
         didSet {
             tableView.reloadData()
         }
@@ -38,6 +38,10 @@ public class FeedViewController: UITableViewController {
     public override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         onViewIsAppearing?(self)
+    }
+    
+    public func display(_ models: [FeedCellController]) {
+        self.models = models
     }
     
     private func cellController(at indexPath: IndexPath) -> FeedCellController {
