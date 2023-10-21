@@ -35,6 +35,11 @@ public class FeedViewController: UITableViewController {
         }
     }
     
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.autoSizeHeader()
+    }
+    
     public override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         onViewIsAppearing?(self)
