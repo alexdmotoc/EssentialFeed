@@ -7,8 +7,6 @@
 
 import CoreData
 
-import CoreData
-
 public final class CoreDataFeedStore {
     private static let modelName = "FeedStore"
     private static let model = NSManagedObjectModel.with(name: modelName, in: Bundle(for: CoreDataFeedStore.self))
