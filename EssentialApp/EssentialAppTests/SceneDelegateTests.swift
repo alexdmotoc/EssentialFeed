@@ -10,7 +10,7 @@ import EssentialFeediOS
 @testable import EssentialApp
 
 final class SceneDelegateTests: XCTestCase {
-    func test_sceneDelegate_setsRootViewControllerCorrectly() {
+    func test_configureWindow_setsRootViewControllerCorrectly() {
         let sut = SceneDelegate()
         sut.window = UIWindow()
         
@@ -19,5 +19,25 @@ final class SceneDelegateTests: XCTestCase {
         let navController = sut.window?.rootViewController as? UINavigationController
         XCTAssertNotNil(navController)
         XCTAssertTrue(navController?.topViewController is FeedViewController)
+    }
+    
+    func test_configureWindow_setsWindowAsKeyAndVisible() {
+        let sut = SceneDelegate()
+        let window = WindowSpy()
+        sut.window = window
+        
+        sut.configureWindow()
+        
+        XCTAssertEqual(window.makeKeyAndVisibleCount, 1)
+    }
+    
+    // MARK: - Helpers
+    
+    private class WindowSpy: UIWindow {
+        private(set) var makeKeyAndVisibleCount = 0
+        
+        override func makeKeyAndVisible() {
+            makeKeyAndVisibleCount += 1
+        }
     }
 }
