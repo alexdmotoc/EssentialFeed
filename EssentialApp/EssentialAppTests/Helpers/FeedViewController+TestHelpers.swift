@@ -70,7 +70,7 @@ extension FeedViewController {
     
     @discardableResult
     func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
-        let cell = simulateCellIsVisible(at: index)
+        let cell = itemCell(at: index)!
         tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
         return cell
     }

@@ -11,7 +11,10 @@ import EssentialFeediOS
 import Combine
 
 enum FeedUIComposer {
-    static func makeFeedController(with feedLoader: @escaping () -> FeedLoader.Publisher, imageLoader: FeedImageDataLoader) -> FeedViewController {
+    static func makeFeedController(
+        with feedLoader: @escaping () -> FeedLoader.Publisher,
+        imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher
+    ) -> FeedViewController {
         let feedLoaderAdapter = FeedLoaderPresenterAdapter(loader: { feedLoader().dispatchOnMainQueue() })
         
         let feedController = FeedViewController.makeWith(
@@ -21,7 +24,9 @@ enum FeedUIComposer {
         
         let feedAdapter = FeedAdapter(
             controller: feedController,
-            imageLoader: MainQueueDispatchDecorator(imageLoader)
+            imageLoader: { url in
+                imageLoader(url).dispatchOnMainQueue()
+            }
         )
         
         feedLoaderAdapter.presenter = FeedPresenter(

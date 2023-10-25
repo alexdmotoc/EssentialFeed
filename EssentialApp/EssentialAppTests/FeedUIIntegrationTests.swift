@@ -301,6 +301,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
         
+        sut.simulateCellIsVisible(at: 0)
         let cell = sut.simulateCellIsNotVisible(at: 0)
         loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
         XCTAssertEqual(cell.renderedImageData, nil)
@@ -325,10 +326,11 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         loader.completeFeedLoad(withFeed: [makeImage()], at: 0)
         
+        sut.simulateCellIsVisible(at: 0)
         let cell = sut.simulateCellIsNotVisible(at: 0)
         sut.simulateCellIsRedisplayed(cell, at: 0)
         
-        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 0)
+        loader.completeImageLoad(withData: UIImage.make(withColor: .red).pngData()!, at: 1)
         XCTAssertNotNil(cell.renderedImageData)
     }
     
@@ -379,7 +381,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
-        let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader)
+        let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader.loadPublisher)
         checkIsDeallocated(sut: loader, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, loader)
