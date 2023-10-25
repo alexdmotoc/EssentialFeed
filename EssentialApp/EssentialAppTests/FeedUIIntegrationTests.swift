@@ -379,7 +379,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
-        let sut = FeedUIComposer.makeFeedController(with: loader, imageLoader: loader)
+        let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader)
         checkIsDeallocated(sut: loader, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, loader)
