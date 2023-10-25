@@ -8,10 +8,14 @@
 import UIKit
 import EssentialFeed
 import EssentialFeediOS
+import Combine
 
-public enum FeedUIComposer {
-    public static func makeFeedController(with feedLoader: FeedLoader, imageLoader: FeedImageDataLoader) -> FeedViewController {
-        let feedLoaderAdapter = FeedLoaderPresenterAdapter(loader: MainQueueDispatchDecorator(feedLoader))
+enum FeedUIComposer {
+    static func makeFeedController(
+        with feedLoader: @escaping () -> FeedLoader.Publisher,
+        imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher
+    ) -> FeedViewController {
+        let feedLoaderAdapter = FeedLoaderPresenterAdapter(loader: { feedLoader().dispatchOnMainQueue() })
         
         let feedController = FeedViewController.makeWith(
             title: FeedPresenter.title,
@@ -20,7 +24,9 @@ public enum FeedUIComposer {
         
         let feedAdapter = FeedAdapter(
             controller: feedController,
-            imageLoader: MainQueueDispatchDecorator(imageLoader)
+            imageLoader: { url in
+                imageLoader(url).dispatchOnMainQueue()
+            }
         )
         
         feedLoaderAdapter.presenter = FeedPresenter(

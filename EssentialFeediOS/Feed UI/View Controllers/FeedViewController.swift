@@ -22,6 +22,8 @@ public class FeedViewController: UITableViewController {
         }
     }
     
+    private var loadingControllers: [IndexPath: FeedCellController] = [:]
+    
     public var delegate: FeedViewControllerDelegate?
     
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
@@ -47,10 +49,22 @@ public class FeedViewController: UITableViewController {
     
     public func display(_ models: [FeedCellController]) {
         self.models = models
+        loadingControllers = [:]
     }
     
     private func cellController(at indexPath: IndexPath) -> FeedCellController {
         models[indexPath.row]
+    }
+    
+    private func cancelLoadingImage(at indexPath: IndexPath) {
+        loadingControllers[indexPath]?.cancelLoad()
+        loadingControllers[indexPath] = nil
+    }
+    
+    private func startLoadingImage(at indexPath: IndexPath, forCell cell: FeedItemCell? = nil) {
+        let controller = cellController(at: indexPath)
+        loadingControllers[indexPath] = controller
+        controller.loadImage(forCell: cell)
     }
     
     @IBAction private func refresh() {
@@ -94,11 +108,11 @@ extension FeedViewController {
 
 extension FeedViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cellController(at: indexPath).loadImage(forCell: cell as? FeedItemCell)
+        startLoadingImage(at: indexPath, forCell: cell as? FeedItemCell)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cellController(at: indexPath).cancelLoad()
+        cancelLoadingImage(at: indexPath)
     }
 }
 
@@ -106,10 +120,10 @@ extension FeedViewController {
 
 extension FeedViewController: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { cellController(at: $0).loadImage() }
+        indexPaths.forEach { startLoadingImage(at: $0) }
     }
     
     public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { cellController(at: $0).cancelLoad() }
+        indexPaths.forEach { cancelLoadingImage(at: $0) }
     }
 }

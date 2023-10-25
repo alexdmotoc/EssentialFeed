@@ -9,9 +9,10 @@ import UIKit
 import EssentialFeediOS
 import EssentialFeed
 import CoreData
+import Combine
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
+    
     var window: UIWindow?
     
     private lazy var storeURL = NSPersistentContainer
@@ -30,6 +31,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         LocalFeedLoader(store: store, currentDate: Date.init)
     }()
     
+    private lazy var remoteFeedLoader: RemoteFeedLoader = {
+        let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
+        return RemoteFeedLoader(client: httpClient, url: baseURL)
+    }()
+    
+    private lazy var remoteFeedImageLoader = RemoteFeedImageDataLoader(client: httpClient)
+    private lazy var localFeedImageLoader = LocalFeedImageDataLoader(store: store)
+    
     convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
         self.init()
         self.httpClient = httpClient
@@ -37,36 +46,41 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let scene = (scene as? UIWindowScene) else { return }
+        
+        window = UIWindow(windowScene: scene)
         
         configureWindow()
     }
     
     func configureWindow() {
-        let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
-        let remoteFeedLoader = RemoteFeedLoader(client: httpClient, url: baseURL)
-        let feedLoaderWithCache = FeedLoaderCacheDecorator(decoratee: remoteFeedLoader, cache: localFeedLoader)
-        
-        let remoteFeedImageLoader = RemoteFeedImageDataLoader(client: httpClient)
-        let localFeedImageLoader = LocalFeedImageDataLoader(store: store)
-        let feedImageLoaderWithCache = FeedImageDataLoaderCacheDecorator(decoratee: remoteFeedImageLoader, cache: localFeedImageLoader)
-        
         let feedController = FeedUIComposer.makeFeedController(
-            with: FeedLoaderWithFallbackComposite(
-                primary: feedLoaderWithCache,
-                fallback: localFeedLoader
-            ),
-            imageLoader: FeedImageDataLoaderWithFallbackComposite(
-                primary: localFeedImageLoader,
-                fallback: feedImageLoaderWithCache
-            )
+            with: makeRemoteFeedLoaderWithLocalFallback,
+            imageLoader: makeLocalFeedImageLoaderWithRemoteFallback
         )
         
         window?.rootViewController = UINavigationController(rootViewController: feedController)
+        window?.makeKeyAndVisible()
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
         localFeedLoader.validateCache { _ in }
     }
+    
+    private func makeRemoteFeedLoaderWithLocalFallback() -> RemoteFeedLoader.Publisher {
+        remoteFeedLoader
+            .loadPublisher()
+            .caching(to: localFeedLoader)
+            .fallback(to: localFeedLoader.loadPublisher)
+    }
+    
+    private func makeLocalFeedImageLoaderWithRemoteFallback(from url: URL) -> FeedImageDataLoader.Publisher {
+        localFeedImageLoader
+            .loadPublisher(from: url)
+            .fallback(to: { [unowned self] in
+                remoteFeedImageLoader
+                    .loadPublisher(from: url)
+                    .caching(to: localFeedImageLoader, for: url)
+            })
+    }
 }
-
