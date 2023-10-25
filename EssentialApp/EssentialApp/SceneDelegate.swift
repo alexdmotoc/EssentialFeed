@@ -80,8 +80,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 extension FeedLoader {
-    public typealias Publisher = AnyPublisher<[FeedItem], Swift.Error>
-    public func loadPublisher() -> Publisher {
+    typealias Publisher = AnyPublisher<[FeedItem], Swift.Error>
+    func loadPublisher() -> Publisher {
         Deferred {
             Future(self.load)
         }
