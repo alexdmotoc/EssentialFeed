@@ -46,7 +46,7 @@ func anyData() -> Data {
     Data("any data".utf8)
 }
 
-func makeJSONData(from items: [[String: String]]) -> Data {
+func makeItemsJSON(_ items: [[String: Any]]) -> Data {
     try! JSONSerialization.data(withJSONObject: [
         "items": items
     ])

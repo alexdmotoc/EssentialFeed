@@ -15,7 +15,7 @@ final class FeedItemMapperTests: XCTestCase {
         
         let item1 = makeItem(id: UUID(), description: nil, location: nil, imageURL: URL(string: "https://a-url.com")!)
         let item2 = makeItem(id: UUID(), description: "some desc", location: "some location", imageURL: URL(string: "https://a-url2.com")!)
-        let json = makeJSONData(from: [item1.json, item2.json])
+        let json = makeItemsJSON([item1.json, item2.json])
         
         try statusCodes.forEach { code in
             XCTAssertThrowsError(
@@ -43,7 +43,7 @@ final class FeedItemMapperTests: XCTestCase {
     func test_map_on200StatusCode_returnsArrayOfItemsForNonEmptyValidJSONData() throws {
         let item1 = makeItem(id: UUID(), description: nil, location: nil, imageURL: URL(string: "https://a-url.com")!)
         let item2 = makeItem(id: UUID(), description: "some desc", location: "some location", imageURL: URL(string: "https://a-url2.com")!)
-        let json = makeJSONData(from: [item1.json, item2.json])
+        let json = makeItemsJSON([item1.json, item2.json])
         
         let results = try FeedItemMapper.map(response: HTTPURLResponse(statusCode: 200), data: json)
         
