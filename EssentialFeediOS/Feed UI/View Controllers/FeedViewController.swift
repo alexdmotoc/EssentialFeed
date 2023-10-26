@@ -74,8 +74,8 @@ public class FeedViewController: UITableViewController {
 
 // MARK: - FeedLoadingView
 
-extension FeedViewController: FeedLoadingView {
-    public func display(_ viewModel: FeedLoadingViewModel) {
+extension FeedViewController: ResourceLoadingView {
+    public func display(_ viewModel: ResourceLoadingViewModel) {
         if viewModel.isLoading {
             refreshControl?.beginRefreshing()
         } else {
@@ -86,8 +86,8 @@ extension FeedViewController: FeedLoadingView {
 
 // MARK: - FeedErrorView
 
-extension FeedViewController: FeedErrorView {
-    public func display(_ viewModel: FeedErrorViewModel) {
+extension FeedViewController: ResourceErrorView {
+    public func display(_ viewModel: ResourceErrorViewModel) {
         errorView.message = viewModel.message
     }
 }

@@ -20,9 +20,8 @@
 		87A5FC472AE17DD20087C621 /* EssentialFeediOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 87A5FC432AE17DD20087C621 /* EssentialFeediOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		87E80E4F2AE2E82900C3EE50 /* FeedUIComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E4D2AE2E82900C3EE50 /* FeedUIComposer.swift */; };
 		87E80E502AE2E82900C3EE50 /* FeedAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E4E2AE2E82900C3EE50 /* FeedAdapter.swift */; };
-		87E80E522AE2E82900C3EE50 /* FeedItemPresentationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E4C2AE2E82900C3EE50 /* FeedItemPresentationAdapter.swift */; };
 		87E80E532AE2E82900C3EE50 /* WeakRefVirtualProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E492AE2E82900C3EE50 /* WeakRefVirtualProxy.swift */; };
-		87E80E542AE2E82900C3EE50 /* FeedLoaderPresenterAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E4B2AE2E82900C3EE50 /* FeedLoaderPresenterAdapter.swift */; };
+		87E80E542AE2E82900C3EE50 /* ResourceLoaderPresenterAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E4B2AE2E82900C3EE50 /* ResourceLoaderPresenterAdapter.swift */; };
 		87E80E562AE2E84300C3EE50 /* FeedUIIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E552AE2E84300C3EE50 /* FeedUIIntegrationTests.swift */; };
 		87E80E5D2AE2E85B00C3EE50 /* UIButton+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E592AE2E85B00C3EE50 /* UIButton+TestHelpers.swift */; };
 		87E80E5E2AE2E85B00C3EE50 /* FeedItemCell+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E80E5C2AE2E85B00C3EE50 /* FeedItemCell+TestHelpers.swift */; };
@@ -77,8 +76,7 @@
 		87A5FC422AE17DD20087C621 /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		87A5FC432AE17DD20087C621 /* EssentialFeediOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = EssentialFeediOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		87E80E492AE2E82900C3EE50 /* WeakRefVirtualProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakRefVirtualProxy.swift; sourceTree = "<group>"; };
-		87E80E4B2AE2E82900C3EE50 /* FeedLoaderPresenterAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoaderPresenterAdapter.swift; sourceTree = "<group>"; };
-		87E80E4C2AE2E82900C3EE50 /* FeedItemPresentationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemPresentationAdapter.swift; sourceTree = "<group>"; };
+		87E80E4B2AE2E82900C3EE50 /* ResourceLoaderPresenterAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceLoaderPresenterAdapter.swift; sourceTree = "<group>"; };
 		87E80E4D2AE2E82900C3EE50 /* FeedUIComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedUIComposer.swift; sourceTree = "<group>"; };
 		87E80E4E2AE2E82900C3EE50 /* FeedAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedAdapter.swift; sourceTree = "<group>"; };
 		87E80E552AE2E84300C3EE50 /* FeedUIIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedUIIntegrationTests.swift; sourceTree = "<group>"; };
@@ -192,9 +190,8 @@
 			children = (
 				87E80E4D2AE2E82900C3EE50 /* FeedUIComposer.swift */,
 				87E80E492AE2E82900C3EE50 /* WeakRefVirtualProxy.swift */,
-				87E80E4B2AE2E82900C3EE50 /* FeedLoaderPresenterAdapter.swift */,
+				87E80E4B2AE2E82900C3EE50 /* ResourceLoaderPresenterAdapter.swift */,
 				87E80E4E2AE2E82900C3EE50 /* FeedAdapter.swift */,
-				87E80E4C2AE2E82900C3EE50 /* FeedItemPresentationAdapter.swift */,
 			);
 			path = Composers;
 			sourceTree = "<group>";
@@ -303,9 +300,8 @@
 				87E80E4F2AE2E82900C3EE50 /* FeedUIComposer.swift in Sources */,
 				87226DBD2ADF0A8B00D13189 /* AppDelegate.swift in Sources */,
 				87226DBF2ADF0A8B00D13189 /* SceneDelegate.swift in Sources */,
-				87E80E522AE2E82900C3EE50 /* FeedItemPresentationAdapter.swift in Sources */,
 				87E80E502AE2E82900C3EE50 /* FeedAdapter.swift in Sources */,
-				87E80E542AE2E82900C3EE50 /* FeedLoaderPresenterAdapter.swift in Sources */,
+				87E80E542AE2E82900C3EE50 /* ResourceLoaderPresenterAdapter.swift in Sources */,
 				87E80E532AE2E82900C3EE50 /* WeakRefVirtualProxy.swift in Sources */,
 				8718AA9E2AE9331600908699 /* CombineHelpers.swift in Sources */,
 			);

@@ -1,19 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "FEED_VIEW_TITLE" : {
-      "comment" : "The title of the main screen",
+    "GENERIC_LOAD_ERROR" : {
+      "comment" : "Generic error message displayed when network loading fails",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "My feed"
+            "value" : "Couldn't connect to the server"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Feedul meu"
+            "value" : "Nu s-a putut face conexiunea către server"
           }
         }
       }

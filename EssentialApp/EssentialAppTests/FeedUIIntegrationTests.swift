@@ -371,13 +371,17 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadWithError(at: 0)
-        XCTAssertEqual(sut.errorMessage, localized("FEED_LOAD_ERROR"))
+        XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
         
         sut.simulateManualFeedLoad()
         XCTAssertEqual(sut.errorMessage, nil)
     }
     
     // MARK: - Helpers
+    
+    private struct DummyView: ResourceView {
+        func display(_ viewModel: Any) {}
+    }
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
