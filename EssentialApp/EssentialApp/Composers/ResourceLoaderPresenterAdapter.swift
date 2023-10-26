@@ -1,5 +1,5 @@
 //
-//  FeedLoaderPresenterAdapter.swift
+//  ResourceLoaderPresenterAdapter.swift
 //  EssentialFeediOS
 //
 //  Created by Alex Motoc on 16.10.2023.
@@ -9,19 +9,21 @@ import EssentialFeed
 import EssentialFeediOS
 import Combine
 
-final class FeedLoaderPresenterAdapter: FeedViewControllerDelegate {
-    private let loader: () -> AnyPublisher<[FeedItem], Error>
+final class ResourceLoaderPresenterAdapter<Resource, View: ResourceView> {
+    private let loader: () -> AnyPublisher<Resource, Error>
     private var cancellable: Cancellable?
-    var presenter: ResourcePresenter<[FeedItem], FeedAdapter>?
+    var presenter: ResourcePresenter<Resource, View>?
     
-    init(loader: @escaping () -> AnyPublisher<[FeedItem], Error>) {
+    init(loader: @escaping () -> AnyPublisher<Resource, Error>) {
         self.loader = loader
     }
     
-    func didRequestFeedRefresh() {
+    func load() {
         presenter?.didStartLoading()
         
-        cancellable = loader().sink(
+        cancellable = loader()
+            .dispatchOnMainQueue()
+            .sink(
             receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:
@@ -34,5 +36,11 @@ final class FeedLoaderPresenterAdapter: FeedViewControllerDelegate {
                 self?.presenter?.didEndLoading(with: items)
             }
         )
+    }
+}
+
+extension ResourceLoaderPresenterAdapter: FeedViewControllerDelegate {
+    func didRequestFeedRefresh() {
+        load()
     }
 }
