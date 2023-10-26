@@ -31,18 +31,22 @@ final class EssentialFeedAPIEndToEndTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func getResult(file: StaticString = #filePath, line: UInt = #line) -> RemoteFeedLoader.Result? {
+    private func getResult(file: StaticString = #filePath, line: UInt = #line) -> Result<[FeedItem], Error>? {
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let client = URLSessionHTTPClient()
-        let service = RemoteFeedLoader(client: client, url: testServerURL)
         checkIsDeallocated(sut: client, file: file, line: line)
-        checkIsDeallocated(sut: service, file: file, line: line)
         
-        var receivedResult: RemoteFeedLoader.Result?
+        var receivedResult: Result<[FeedItem], Error>?
         let exp = expectation(description: "wait for request to complete")
         
-        service.load { result in
-            receivedResult = result
+        client.get(url: testServerURL) { result in
+            receivedResult = result.flatMap({ (response, data) in
+                do {
+                    return .success(try FeedItemMapper.map(response: response, data: data))
+                } catch {
+                    return .failure(error)
+                }
+            })
             exp.fulfill()
         }
         

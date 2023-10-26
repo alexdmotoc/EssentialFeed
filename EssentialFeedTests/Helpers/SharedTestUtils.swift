@@ -1,5 +1,5 @@
 //
-//  XCTestCase+Utils.swift
+//  SharedTestUtils.swift
 //  EssentialFeedTests
 //
 //  Created by Alex Motoc on 02.08.2023.
@@ -44,4 +44,16 @@ func anyURL() -> URL {
 
 func anyData() -> Data {
     Data("any data".utf8)
+}
+
+func makeJSONData(from items: [[String: String]]) -> Data {
+    try! JSONSerialization.data(withJSONObject: [
+        "items": items
+    ])
+}
+
+extension HTTPURLResponse {
+    convenience init(statusCode: Int) {
+        self.init(url: anyURL(), statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+    }
 }

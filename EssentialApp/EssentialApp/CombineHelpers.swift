@@ -9,10 +9,28 @@ import Foundation
 import Combine
 import EssentialFeed
 
+// MARK: - HTTPClient
+
+extension HTTPClient {
+    typealias Publisher = AnyPublisher<(response: HTTPURLResponse, data: Data), Error>
+    
+    func getPublisher(at url: URL) -> Publisher {
+        var task: HTTPClientTask?
+        return Deferred {
+            Future { completion in
+                task = get(url: url, completion: completion)
+            }
+        }
+        .handleEvents(receiveCancel: { task?.cancel() })
+        .eraseToAnyPublisher()
+    }
+}
+
 // MARK: - Feed image data loader
 
 extension FeedImageDataLoader {
     typealias Publisher = AnyPublisher<Data, Error>
+    
     func loadPublisher(from url: URL) -> Publisher {
         var task: FeedImageDataLoaderTask?
         return Deferred {
@@ -46,6 +64,7 @@ private extension FeedImageDataCache {
 
 extension FeedLoader {
     typealias Publisher = AnyPublisher<[FeedItem], Error>
+    
     func loadPublisher() -> Publisher {
         Deferred {
             Future(self.load)
