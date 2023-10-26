@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "IMAGE_COMMENTS_VIEW_TITLE" : {
+      "comment" : "The title of the comments screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comentarii"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

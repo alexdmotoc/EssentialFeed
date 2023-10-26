@@ -1,5 +1,5 @@
 //
-//  ImmageCommentsMapperTests.swift
+//  ImageCommentsMapperTests.swift
 //  EssentialFeedTests
 //
 //  Created by Alex Motoc on 26.10.2023.
@@ -8,7 +8,7 @@
 import XCTest
 import EssentialFeed
 
-final class ImmageCommentsMapperTests: XCTestCase {
+final class ImageCommentsMapperTests: XCTestCase {
 
     func test_map_throwsErrorOnNon2xxHTTPResponse() throws {
             let json = makeItemsJSON([])
