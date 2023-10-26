@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "GENERIC_LOAD_ERROR" : {
+      "comment" : "Generic error message displayed when network loading fails",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't connect to the server"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu s-a putut face conexiunea către server"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
