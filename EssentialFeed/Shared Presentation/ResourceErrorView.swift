@@ -14,6 +14,10 @@ public protocol ResourceErrorView {
 public struct ResourceErrorViewModel {
     public let message: String?
     
+    public init(message: String?) {
+        self.message = message
+    }
+    
     static var noError: Self {
         .init(message: nil)
     }

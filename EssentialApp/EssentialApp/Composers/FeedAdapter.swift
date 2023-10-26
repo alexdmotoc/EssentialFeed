@@ -10,6 +10,9 @@ import EssentialFeed
 import EssentialFeediOS
 
 final class FeedAdapter: ResourceView {
+    
+    private typealias FeedItemPresentationAdapter = ResourceLoaderPresenterAdapter<Data, WeakRefVirtualProxy<FeedCellController>>
+    
     private weak var controller: FeedViewController?
     private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
     
@@ -19,14 +22,35 @@ final class FeedAdapter: ResourceView {
     }
     
     func display(_ viewModel: FeedViewModel) {
-        controller?.display(viewModel.feed.map {
-            let adapter = FeedItemPresentationAdapter<WeakRefVirtualProxy<FeedCellController>, UIImage>(
-                model: $0,
-                loader: imageLoader
+        controller?.display(viewModel.feed.map { model in
+            let adapter = FeedItemPresentationAdapter(loader: { [imageLoader] in
+                imageLoader(model.imageURL)
+            })
+            let view = FeedCellController(
+                delegate: adapter,
+                viewModel: .init(
+                    description: model.description,
+                    location: model.location
+                )
             )
-            let view = FeedCellController(delegate: adapter)
-            adapter.presenter = .init(view: WeakRefVirtualProxy(view), imageTransformer: UIImage.init)
+            adapter.presenter = .init(
+                loadingView: WeakRefVirtualProxy(view),
+                resourceView: WeakRefVirtualProxy(view),
+                errorView: WeakRefVirtualProxy(view),
+                mapper: Data.tryMap
+            )
             return view
         })
+    }
+}
+
+private extension Data {
+    struct ImageDataMappingError: Error {}
+    
+    static func tryMap(_ data: Data) throws -> UIImage {
+        guard let image = UIImage(data: data) else {
+            throw ImageDataMappingError()
+        }
+        return image
     }
 }

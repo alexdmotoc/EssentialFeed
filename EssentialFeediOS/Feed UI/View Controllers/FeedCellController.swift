@@ -11,33 +11,41 @@ import EssentialFeed
 public protocol FeedCellControllerDelegate {
     func didRequestImage()
     func didCancelImageRequest()
-    func didDequeueCell()
 }
 
-public final class FeedCellController: FeedImageView {
+public final class FeedCellController: ResourceLoadingView, ResourceErrorView, ResourceView {
+    
+    public typealias ResourceViewModel = UIImage
     
     private let delegate: FeedCellControllerDelegate
+    private let viewModel: FeedImageViewModel
     private var cell: FeedItemCell?
     
-    public init(delegate: FeedCellControllerDelegate) {
+    public init(delegate: FeedCellControllerDelegate, viewModel: FeedImageViewModel) {
         self.delegate = delegate
+        self.viewModel = viewModel
     }
     
     func view(in tableView: UITableView) -> FeedItemCell {
         cell = tableView.dequeueCell()
-        delegate.didDequeueCell()
-        return cell!
-    }
-    
-    public func display(_ viewModel: FeedImageViewModel<UIImage>) {
         cell?.descriptionLabel.text = viewModel.description
         cell?.descriptionLabel.isHidden = viewModel.description == nil
         cell?.locationLabel.text = viewModel.location
         cell?.locationContainer.isHidden = viewModel.location == nil
-        cell?.feedImageView.setImageAnimated(viewModel.image)
-        cell?.retryButton.isHidden = viewModel.isRetryHidden
         cell?.onRetry = { [weak self] in self?.delegate.didRequestImage() }
         cell?.onPrepareForReuse = { [weak self] in self?.releaseCellReference() }
+        return cell!
+    }
+    
+    public func display(_ viewModel: UIImage) {
+        cell?.feedImageView.setImageAnimated(viewModel)
+    }
+    
+    public func display(_ viewModel: ResourceErrorViewModel) {
+        cell?.retryButton.isHidden = viewModel.message == nil
+    }
+    
+    public func display(_ viewModel: ResourceLoadingViewModel) {
         if viewModel.isLoading {
             cell?.feedImageContainer.startShimmering()
         } else {
