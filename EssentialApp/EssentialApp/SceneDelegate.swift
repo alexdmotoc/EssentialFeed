@@ -31,13 +31,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         LocalFeedLoader(store: store, currentDate: Date.init)
     }()
     
-    private lazy var remoteFeedLoader: RemoteFeedLoader = {
-        let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
-        return RemoteFeedLoader(client: httpClient, url: baseURL)
-    }()
-    
-    private lazy var remoteFeedImageLoader = RemoteFeedImageDataLoader(client: httpClient)
     private lazy var localFeedImageLoader = LocalFeedImageDataLoader(store: store)
+    
+    private let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
     
     convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
         self.init()
@@ -67,9 +63,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         localFeedLoader.validateCache { _ in }
     }
     
-    private func makeRemoteFeedLoaderWithLocalFallback() -> RemoteFeedLoader.Publisher {
-        remoteFeedLoader
-            .loadPublisher()
+    private func makeRemoteFeedLoaderWithLocalFallback() -> AnyPublisher<[FeedItem], Error> {
+        httpClient
+            .getPublisher(at: baseURL)
+            .tryMap(FeedItemMapper.map)
             .caching(to: localFeedLoader)
             .fallback(to: localFeedLoader.loadPublisher)
     }
@@ -78,8 +75,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         localFeedImageLoader
             .loadPublisher(from: url)
             .fallback(to: { [unowned self] in
-                remoteFeedImageLoader
-                    .loadPublisher(from: url)
+                httpClient
+                    .getPublisher(at: url)
+                    .tryMap(FeedImageDataMapper.map)
                     .caching(to: localFeedImageLoader, for: url)
             })
     }

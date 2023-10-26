@@ -30,8 +30,8 @@ extension LocalFeedLoader: FeedCache {
     }
 }
 
-extension LocalFeedLoader: FeedLoader {
-    public func load(completion: @escaping (FeedLoader.Result) -> Void) {
+extension LocalFeedLoader {
+    public func load(completion: @escaping (Result<[FeedItem], Error>) -> Void) {
         store.retrieve { [weak self] result in
             guard let self else { return }
             switch result {
