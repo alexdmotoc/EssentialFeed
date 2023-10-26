@@ -15,7 +15,7 @@ public final class ResourcePresenter<Resource, View: ResourceView> {
     private let errorView: ResourceErrorView
     private let mapper: Mapper
     
-    private static var loadError: String {
+    public static var loadError: String {
         String(
             localized: "GENERIC_LOAD_ERROR",
             table: "Shared",

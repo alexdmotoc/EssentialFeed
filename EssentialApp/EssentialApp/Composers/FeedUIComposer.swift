@@ -29,10 +29,11 @@ enum FeedUIComposer {
             }
         )
         
-        feedLoaderAdapter.presenter = FeedPresenter(
-            feedLoadingView: WeakRefVirtualProxy(feedController),
-            feedView: feedAdapter, 
-            errorView: WeakRefVirtualProxy(feedController)
+        feedLoaderAdapter.presenter = ResourcePresenter<[FeedItem], FeedAdapter>(
+            loadingView: WeakRefVirtualProxy(feedController),
+            resourceView: feedAdapter,
+            errorView: WeakRefVirtualProxy(feedController), 
+            mapper: FeedPresenter.map
         )
         
         return feedController
