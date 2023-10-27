@@ -1,5 +1,5 @@
 //
-//  FeedViewController.swift
+//  ListViewController.swift
 //  EssentialFeediOS
 //
 //  Created by Alex Motoc on 11.10.2023.
@@ -14,7 +14,7 @@ public protocol CellController {
     func cancelLoad()
 }
 
-public class FeedViewController: UITableViewController {
+public class ListViewController: UITableViewController {
     
     @IBOutlet private(set) public var errorView: ErrorView!
     
@@ -23,7 +23,7 @@ public class FeedViewController: UITableViewController {
     }
     
     private var loadingControllers: [IndexPath: CellController] = [:]
-    private var onViewIsAppearing: ((FeedViewController) -> Void)?
+    private var onViewIsAppearing: ((ListViewController) -> Void)?
     
     public var onRefresh: (() -> Void)?
     
@@ -73,7 +73,7 @@ public class FeedViewController: UITableViewController {
 
 // MARK: - FeedLoadingView
 
-extension FeedViewController: ResourceLoadingView {
+extension ListViewController: ResourceLoadingView {
     public func display(_ viewModel: ResourceLoadingViewModel) {
         if viewModel.isLoading {
             refreshControl?.beginRefreshing()
@@ -85,7 +85,7 @@ extension FeedViewController: ResourceLoadingView {
 
 // MARK: - FeedErrorView
 
-extension FeedViewController: ResourceErrorView {
+extension ListViewController: ResourceErrorView {
     public func display(_ viewModel: ResourceErrorViewModel) {
         errorView.message = viewModel.message
     }
@@ -93,7 +93,7 @@ extension FeedViewController: ResourceErrorView {
 
 // MARK: - UITableViewDataSource
 
-extension FeedViewController {
+extension ListViewController {
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         models.count
     }
@@ -105,7 +105,7 @@ extension FeedViewController {
 
 // MARK: - UITableViewDelegate
 
-extension FeedViewController {
+extension ListViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         startPreload(at: indexPath, forCell: cell as? FeedItemCell)
     }
@@ -117,7 +117,7 @@ extension FeedViewController {
 
 // MARK: - UITableViewDataSourcePrefetching
 
-extension FeedViewController: UITableViewDataSourcePrefetching {
+extension ListViewController: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { startPreload(at: $0) }
     }

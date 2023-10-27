@@ -383,7 +383,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         func display(_ viewModel: Any) {}
     }
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: ListViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
         let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader.loadPublisher)
         checkIsDeallocated(sut: loader, file: file, line: line)
@@ -392,7 +392,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     }
     
     private func assertThat(
-        _ sut: FeedViewController,
+        _ sut: ListViewController,
         isRendering images: [FeedItem],
         file: StaticString = #filePath,
         line: UInt = #line
@@ -409,7 +409,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     }
     
     private func assertThat(
-        _ sut: FeedViewController,
+        _ sut: ListViewController,
         isRendering image: FeedItem,
         at index: Int,
         file: StaticString = #filePath,
