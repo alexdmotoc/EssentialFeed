@@ -16,9 +16,9 @@ final class FeedSnapshotTests: XCTestCase {
         
         sut.display(feedWithContent())
         
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_CONTENT_light")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_CONTENT_dark")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_CONTENT_dark_extraExtraExtraLarge")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .light)), named: "FEED_WITH_CONTENT_light")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark)), named: "FEED_WITH_CONTENT_dark")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_CONTENT_dark_extraExtraExtraLarge")
     }
     
     func test_feedWithImageLoadError() {
@@ -26,9 +26,9 @@ final class FeedSnapshotTests: XCTestCase {
         
         sut.display(feedWithImageLoadError())
         
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_IMAGE_LOAD_ERROR_light")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark_extraExtraExtraLarge")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .light)), named: "FEED_WITH_IMAGE_LOAD_ERROR_light")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark_extraExtraExtraLarge")
     }
     
     // MARK: - Helpers
@@ -80,7 +80,7 @@ private extension ListViewController {
             $0.controller = controller
             return controller
         }
-        display(controllers.map(CellController.init))
+        display(controllers.map { CellController(id: UUID(), dataSource: $0) })
     }
 }
 

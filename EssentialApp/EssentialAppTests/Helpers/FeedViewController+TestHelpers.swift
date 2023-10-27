@@ -10,13 +10,6 @@ import UIKit
 @testable import EssentialFeediOS
 
 extension ListViewController {
-    
-    public override func loadViewIfNeeded() {
-        super.loadViewIfNeeded()
-        
-        tableView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
-    }
-    
     var isShowingLoadingIndicator: Bool {
         refreshControl?.isRefreshing ?? false
     }
@@ -42,7 +35,12 @@ extension ListViewController {
     }
     
     func prepareForInitialAppearance() {
+        setSmallFrameToPreventRenderingCells()
         replaceRefreshControlWithSpyForiOS17Support()
+    }
+    
+    func setSmallFrameToPreventRenderingCells() {
+        tableView.frame = CGRect(x: 0, y: 0, width: 390, height: 1)
     }
     
     func replaceRefreshControlWithSpyForiOS17Support() {

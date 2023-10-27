@@ -16,9 +16,9 @@ final class ImageCommentsSnapshotTests: XCTestCase {
         
         sut.display(comments())
         
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "COMMENTS_WITH_CONTENT_light")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "COMMENTS_WITH_CONTENT_dark")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark, contentSize: .extraExtraExtraLarge)), named: "COMMENTS_WITH_CONTENT_dark_extraExtraExtraLarge")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .light)), named: "COMMENTS_WITH_CONTENT_light")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark)), named: "COMMENTS_WITH_CONTENT_dark")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark, contentSize: .extraExtraExtraLarge)), named: "COMMENTS_WITH_CONTENT_dark_extraExtraExtraLarge")
     }
     
     // MARK: - Helpers
@@ -34,7 +34,7 @@ final class ImageCommentsSnapshotTests: XCTestCase {
     }
     
     private func comments() -> [CellController] {
-        commentControllers().map(CellController.init)
+        commentControllers().map { CellController(id: UUID(), dataSource: $0) }
     }
     
     private func commentControllers() -> [ImageCommentCellController] {
