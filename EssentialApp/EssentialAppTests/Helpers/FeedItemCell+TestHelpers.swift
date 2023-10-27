@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import EssentialFeediOS
+@testable import EssentialFeediOS
 
 extension FeedItemCell {
     var descriptionText: String? { descriptionLabel.text }

@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import EssentialFeediOS
+@testable import EssentialFeediOS
 
 extension ListViewController {
     

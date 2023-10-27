@@ -23,14 +23,9 @@ enum FeedUIComposer {
         let feedController = ListViewController.makeWith(title: FeedPresenter.title)
         feedController.onRefresh = feedLoaderAdapter.load
         
-        let feedAdapter = FeedAdapter(
-            controller: feedController,
-            imageLoader: { url in
-                imageLoader(url).dispatchOnMainQueue()
-            }
-        )
+        let feedAdapter = FeedAdapter(controller: feedController, imageLoader: imageLoader)
         
-        feedLoaderAdapter.presenter = ResourcePresenter<[FeedItem], FeedAdapter>(
+        feedLoaderAdapter.presenter = ResourcePresenter(
             loadingView: WeakRefVirtualProxy(feedController),
             resourceView: feedAdapter,
             errorView: WeakRefVirtualProxy(feedController), 
