@@ -49,7 +49,7 @@
                                             <rect key="frame" x="20" y="11" width="353" height="453"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="UgO-jL-PR6">
-                                                    <rect key="frame" x="0.0" y="0.0" width="353" height="40.666666666666664"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="353" height="25"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mappin.and.ellipse" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Q0c-7x-v7a">
                                                             <rect key="frame" x="0.0" y="-1.3333333333333357" width="25" height="26.333333333333336"/>
@@ -60,7 +60,7 @@
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Location Location Location Location Location Location " textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V0S-Zq-QlX">
-                                                            <rect key="frame" x="33" y="0.0" width="320" height="40.666666666666664"/>
+                                                            <rect key="frame" x="33" y="0.0" width="320" height="25"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <color key="textColor" systemColor="systemGray3Color"/>
                                                             <nil key="highlightedColor"/>
@@ -68,17 +68,17 @@
                                                     </subviews>
                                                 </stackView>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Y9-Tk-IxC">
-                                                    <rect key="frame" x="0.0" y="50.666666666666657" width="353" height="353"/>
+                                                    <rect key="frame" x="0.0" y="35" width="353" height="306.33333333333331"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hBR-Ca-IGo">
-                                                            <rect key="frame" x="0.0" y="0.0" width="353" height="353"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="353" height="306.33333333333331"/>
                                                             <accessibility key="accessibilityConfiguration" identifier="feed-image-view"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="hBR-Ca-IGo" secondAttribute="height" multiplier="1:1" priority="999" id="jqX-nU-DpP"/>
                                                             </constraints>
                                                         </imageView>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZzN-Cs-obU">
-                                                            <rect key="frame" x="0.0" y="0.0" width="353" height="353"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="353" height="306.33333333333331"/>
                                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="60"/>
                                                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                             <state key="normal" title="↺"/>
@@ -104,8 +104,8 @@
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                 </view>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZXq-6P-lyI">
-                                                    <rect key="frame" x="0.0" y="413.66666666666669" width="353" height="39.333333333333314"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZXq-6P-lyI">
+                                                    <rect key="frame" x="0.0" y="351.33333333333331" width="353" height="101.66666666666669"/>
                                                     <string key="text">Description Description Description Description Description Description Description Description Description Description Description Description Description Description </string>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
