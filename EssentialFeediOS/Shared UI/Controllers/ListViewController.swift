@@ -25,7 +25,7 @@ public class ListViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.tableHeaderView = errorView
-        errorView.onDismiss = handleErrorDismiss
+        errorView.onDismiss = { [weak self] in self?.handleErrorDismiss() }
         
         onViewIsAppearing = { vc in
             vc.refresh()
