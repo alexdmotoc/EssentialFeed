@@ -25,6 +25,7 @@ public class ListViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.tableHeaderView = errorView
+        errorView.onDismiss = handleErrorDismiss
         
         onViewIsAppearing = { vc in
             vc.refresh()
@@ -65,6 +66,12 @@ public class ListViewController: UITableViewController {
     
     @IBAction private func refresh() {
         onRefresh?()
+    }
+    
+    private func handleErrorDismiss() {
+        tableView.beginUpdates()
+        tableView.autoSizeHeader()
+        tableView.endUpdates()
     }
 }
 

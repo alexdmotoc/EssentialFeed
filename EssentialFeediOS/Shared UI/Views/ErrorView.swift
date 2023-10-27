@@ -7,19 +7,9 @@
 
 import UIKit
 
-public final class ErrorView: UIView {
-    private lazy var label: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 17)
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        return label
-    }()
-    
+public final class ErrorView: UIButton {
     public var message: String? {
-        get { return isVisible ? label.text : nil }
+        get { return isVisible ? configuration?.title : nil }
         set { setMessageAnimated(newValue) }
     }
     
@@ -29,28 +19,36 @@ public final class ErrorView: UIView {
         configureUI()
     }
     
+    var onDismiss: (() -> Void)?
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-    }
-    
-    public override func awakeFromNib() {
-        super.awakeFromNib()
-        hideMessage()
     }
     
     private var isVisible: Bool {
         return alpha > 0
     }
     
+    private var titleAttributes: AttributeContainer {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        
+        var attributes = AttributeContainer()
+        attributes.paragraphStyle = paragraphStyle
+        attributes.font = UIFont.preferredFont(forTextStyle: .body)
+        return attributes
+    }
+    
     private func configureUI() {
         backgroundColor = .systemRed
-        addSubview(label)
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            trailingAnchor.constraint(equalTo: label.trailingAnchor, constant: 8),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 8)
-        ])
+        var configuration = Configuration.plain()
+        configuration.titlePadding = 0
+        configuration.baseForegroundColor = .white
+        configuration.background.backgroundColor = .systemRed
+        configuration.background.cornerRadius = 0
+        self.configuration = configuration
+        
+        addTarget(self, action: #selector(hideMessageAnimated), for: .touchUpInside)
     }
     
     private func setMessageAnimated(_ message: String?) {
@@ -62,7 +60,8 @@ public final class ErrorView: UIView {
     }
     
     private func showAnimated(_ message: String) {
-        label.text = message
+        configuration?.attributedTitle = AttributedString(message, attributes: titleAttributes)
+        configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
         
         UIView.animate(withDuration: 0.25) {
             self.alpha = 1
@@ -70,16 +69,20 @@ public final class ErrorView: UIView {
     }
     
     private func hideMessage() {
-        label.text = nil
+        configuration?.attributedTitle = nil
+        configuration?.contentInsets = .zero
         alpha = 0
     }
     
-    private func hideMessageAnimated() {
+    @objc private func hideMessageAnimated() {
         UIView.animate(
             withDuration: 0.25,
             animations: { self.alpha = 0 },
             completion: { completed in
-                if completed { self.hideMessage() }
+                if completed { 
+                    self.hideMessage()
+                    self.onDismiss?()
+                }
             }
         )
     }

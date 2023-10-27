@@ -92,6 +92,10 @@ extension ListViewController {
         tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: itemsSection)])
     }
     
+    func simulateErrorMessageTap() {
+        errorView.simulateTap()
+    }
+    
     func renderedImageData(at index: Int) -> Data? {
         simulateCellIsVisible(at: index).renderedImageData
     }
