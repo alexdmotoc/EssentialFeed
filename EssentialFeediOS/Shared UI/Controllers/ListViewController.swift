@@ -8,12 +8,6 @@
 import UIKit
 import EssentialFeed
 
-public protocol CellController {
-    func view(in tableView: UITableView) -> UITableViewCell
-    func preload(for cell: UITableViewCell?)
-    func cancelLoad()
-}
-
 public class ListViewController: UITableViewController {
     
     @IBOutlet private(set) public var errorView: ErrorView!
@@ -55,15 +49,16 @@ public class ListViewController: UITableViewController {
         models[indexPath.row]
     }
     
-    private func cancelLoad(at indexPath: IndexPath) {
-        loadingControllers[indexPath]?.cancelLoad()
+    private func removeLoadController(at indexPath: IndexPath) -> CellController? {
+        let controller = loadingControllers[indexPath]
         loadingControllers[indexPath] = nil
+        return controller
     }
     
-    private func startPreload(at indexPath: IndexPath, forCell cell: FeedItemCell? = nil) {
+    private func addLoadController(at indexPath: IndexPath) -> CellController {
         let controller = cellController(at: indexPath)
         loadingControllers[indexPath] = controller
-        controller.preload(for: cell)
+        return controller
     }
     
     @IBAction private func refresh() {
@@ -99,7 +94,8 @@ extension ListViewController {
     }
     
     public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        cellController(at: indexPath).view(in: tableView)
+        let controller = cellController(at: indexPath)
+        return controller.dataSource.tableView(tableView, cellForRowAt: indexPath)
     }
 }
 
@@ -107,11 +103,13 @@ extension ListViewController {
 
 extension ListViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        startPreload(at: indexPath, forCell: cell as? FeedItemCell)
+        let controller = addLoadController(at: indexPath)
+        controller.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: indexPath)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cancelLoad(at: indexPath)
+        let controller = removeLoadController(at: indexPath)
+        controller?.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: indexPath)
     }
 }
 
@@ -119,10 +117,16 @@ extension ListViewController {
 
 extension ListViewController: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { startPreload(at: $0) }
+        indexPaths.forEach { indexPath in
+            let controller = addLoadController(at: indexPath)
+            controller.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [indexPath])
+        }
     }
     
     public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach { cancelLoad(at: $0) }
+        indexPaths.forEach { indexPath in
+            let controller = removeLoadController(at: indexPath)
+            controller?.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [indexPath])
+        }
     }
 }

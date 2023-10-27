@@ -78,7 +78,7 @@ private extension ListViewController {
             $0.controller = controller
             return controller
         }
-        display(controllers)
+        display(controllers.map(CellController.init))
     }
 }
 
