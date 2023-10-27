@@ -11,12 +11,18 @@ import UIKit
 
 extension ListViewController {
     
+    public override func loadViewIfNeeded() {
+        super.loadViewIfNeeded()
+        
+        view.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+    }
+    
     var isShowingLoadingIndicator: Bool {
         refreshControl?.isRefreshing ?? false
     }
     
     var numberOfRenderedImages: Int {
-        tableView.numberOfRows(inSection: itemsSection)
+        tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: itemsSection)
     }
     
     var errorMessage: String? {
