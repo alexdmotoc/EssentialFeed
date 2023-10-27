@@ -14,7 +14,7 @@ extension ListViewController {
     public override func loadViewIfNeeded() {
         super.loadViewIfNeeded()
         
-        view.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+        tableView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
     }
     
     var isShowingLoadingIndicator: Bool {

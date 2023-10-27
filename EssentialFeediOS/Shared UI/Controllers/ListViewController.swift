@@ -20,7 +20,6 @@ public class ListViewController: UITableViewController {
         return ds
     }()
     
-    private var loadingControllers: [IndexPath: CellController] = [:]
     private var onViewIsAppearing: ((ListViewController) -> Void)?
     
     public var onRefresh: (() -> Void)?
@@ -52,25 +51,12 @@ public class ListViewController: UITableViewController {
         snapshot.appendSections([0])
         snapshot.appendItems(models)
         dataSource.apply(snapshot)
-        loadingControllers = [:]
     }
     
     private func cellController(at indexPath: IndexPath) -> CellController? {
         dataSource.itemIdentifier(for: indexPath)
     }
-    
-    private func removeLoadController(at indexPath: IndexPath) -> CellController? {
-        let controller = loadingControllers[indexPath]
-        loadingControllers[indexPath] = nil
-        return controller
-    }
-    
-    private func addLoadController(at indexPath: IndexPath) -> CellController? {
-        let controller = cellController(at: indexPath)
-        loadingControllers[indexPath] = controller
-        return controller
-    }
-    
+        
     @IBAction private func refresh() {
         onRefresh?()
     }
@@ -111,12 +97,12 @@ extension ListViewController: ResourceErrorView {
 
 extension ListViewController {
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let controller = addLoadController(at: indexPath)
+        let controller = cellController(at: indexPath)
         controller?.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: indexPath)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let controller = removeLoadController(at: indexPath)
+        let controller = cellController(at: indexPath)
         controller?.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: indexPath)
     }
 }
@@ -126,14 +112,14 @@ extension ListViewController {
 extension ListViewController: UITableViewDataSourcePrefetching {
     public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { indexPath in
-            let controller = addLoadController(at: indexPath)
+            let controller = cellController(at: indexPath)
             controller?.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [indexPath])
         }
     }
     
     public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
         indexPaths.forEach { indexPath in
-            let controller = removeLoadController(at: indexPath)
+            let controller = cellController(at: indexPath)
             controller?.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [indexPath])
         }
     }
