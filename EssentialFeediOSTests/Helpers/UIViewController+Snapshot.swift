@@ -20,23 +20,22 @@ struct SnapshotConfiguration {
     let traitCollection: UITraitCollection
     
     static func iPhone(style: UIUserInterfaceStyle, contentSize: UIContentSizeCategory = .medium) -> SnapshotConfiguration {
-        let traits = UITraitCollection(mutations: { mutableTraits in
-            mutableTraits.forceTouchCapability = .available
-            mutableTraits.layoutDirection = .leftToRight
-            mutableTraits.preferredContentSizeCategory = contentSize
-            mutableTraits.userInterfaceIdiom = .phone
-            mutableTraits.horizontalSizeClass = .compact
-            mutableTraits.verticalSizeClass = .regular
-            mutableTraits.displayScale = 2
-            mutableTraits.displayGamut = .P3
-            mutableTraits.userInterfaceStyle = style
-        })
-        return SnapshotConfiguration(
-            size: CGSize(width: 375, height: 667),
-            safeAreaInsets: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0),
-            layoutMargins: UIEdgeInsets(top: 20, left: 16, bottom: 0, right: 16),
-            traitCollection: traits
-        )
+        SnapshotConfiguration(
+            size: CGSize(width: 390, height: 844),
+            safeAreaInsets: UIEdgeInsets(top: 47, left: 0, bottom: 34, right: 0),
+            layoutMargins: UIEdgeInsets(top: 55, left: 8, bottom: 42, right: 8),
+            traitCollection: UITraitCollection(mutations: { traits in
+                traits.forceTouchCapability = .unavailable
+                traits.layoutDirection = .leftToRight
+                traits.preferredContentSizeCategory = contentSize
+                traits.userInterfaceIdiom = .phone
+                traits.horizontalSizeClass = .compact
+                traits.verticalSizeClass = .regular
+                traits.displayScale = 3
+                traits.accessibilityContrast = .normal
+                traits.displayGamut = .P3
+                traits.userInterfaceStyle = style
+            }))
     }
 }
 
@@ -53,21 +52,11 @@ private final class SnapshotWindow: UIWindow {
     }
     
     override var safeAreaInsets: UIEdgeInsets {
-        return configuration.safeAreaInsets
+        configuration.safeAreaInsets
     }
     
     override var traitCollection: UITraitCollection {
-        return super.traitCollection.modifyingTraits { mutableTraits in
-            mutableTraits.forceTouchCapability = configuration.traitCollection.forceTouchCapability
-            mutableTraits.layoutDirection = configuration.traitCollection.layoutDirection
-            mutableTraits.preferredContentSizeCategory = configuration.traitCollection.preferredContentSizeCategory
-            mutableTraits.userInterfaceIdiom = configuration.traitCollection.userInterfaceIdiom
-            mutableTraits.horizontalSizeClass = configuration.traitCollection.horizontalSizeClass
-            mutableTraits.verticalSizeClass = configuration.traitCollection.verticalSizeClass
-            mutableTraits.displayScale = configuration.traitCollection.displayScale
-            mutableTraits.displayGamut = configuration.traitCollection.displayGamut
-            mutableTraits.userInterfaceStyle = configuration.traitCollection.userInterfaceStyle
-        }
+        configuration.traitCollection
     }
     
     func snapshot() -> UIImage {

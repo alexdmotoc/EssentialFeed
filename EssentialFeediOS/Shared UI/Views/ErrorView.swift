@@ -33,10 +33,10 @@ public final class ErrorView: UIButton {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
         
-        var attributes = AttributeContainer()
-        attributes.paragraphStyle = paragraphStyle
-        attributes.font = UIFont.preferredFont(forTextStyle: .body)
-        return attributes
+        return AttributeContainer([
+            .paragraphStyle: paragraphStyle,
+            .font: UIFont.preferredFont(forTextStyle: .body)
+        ])
     }
     
     private func configureUI() {
