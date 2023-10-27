@@ -50,7 +50,7 @@ public class ListViewController: UITableViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Int, CellController>()
         snapshot.appendSections([0])
         snapshot.appendItems(models)
-        dataSource.apply(snapshot)
+        dataSource.applySnapshotUsingReloadData(snapshot)
     }
     
     private func cellController(at indexPath: IndexPath) -> CellController? {
