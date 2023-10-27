@@ -18,7 +18,7 @@ final class SceneDelegateTests: XCTestCase {
         
         let navController = sut.window?.rootViewController as? UINavigationController
         XCTAssertNotNil(navController)
-        XCTAssertTrue(navController?.topViewController is FeedViewController)
+        XCTAssertTrue(navController?.topViewController is ListViewController)
     }
     
     func test_configureWindow_setsWindowAsKeyAndVisible() {

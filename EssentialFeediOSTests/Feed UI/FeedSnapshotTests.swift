@@ -11,15 +11,6 @@ import EssentialFeed
 
 final class FeedSnapshotTests: XCTestCase {
     
-    func test_emptyFeed() {
-        let sut = makeSUT()
-        
-        sut.display(emptyFeed())
-        
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "EMPTY_FEED_light")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "EMPTY_FEED_dark")
-    }
-    
     func test_feedWithContent() {
         let sut = makeSUT()
         
@@ -27,15 +18,7 @@ final class FeedSnapshotTests: XCTestCase {
         
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_CONTENT_light")
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_CONTENT_dark")
-    }
-    
-    func test_feedWithError() {
-        let sut = makeSUT()
-        
-        sut.display(.error(message: "This is a\nmulti-line\nerror message"))
-        
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_ERROR_light")
-        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_ERROR_dark")
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_CONTENT_dark_extraExtraExtraLarge")
     }
     
     func test_feedWithImageLoadError() {
@@ -45,21 +28,18 @@ final class FeedSnapshotTests: XCTestCase {
         
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_IMAGE_LOAD_ERROR_light")
         assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark")
+        assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark_extraExtraExtraLarge")
     }
     
     // MARK: - Helpers
-    private func makeSUT() -> FeedViewController {
-        let bundle = Bundle(for: FeedViewController.self)
+    private func makeSUT() -> ListViewController {
+        let bundle = Bundle(for: ListViewController.self)
         let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
-        let controller = storyboard.instantiateInitialViewController() as! FeedViewController
+        let controller = storyboard.instantiateInitialViewController() as! ListViewController
         controller.loadViewIfNeeded()
         controller.tableView.showsVerticalScrollIndicator = false
         controller.tableView.showsHorizontalScrollIndicator = false
         return controller
-    }
-    
-    private func emptyFeed() -> [FeedCellController] {
-        []
     }
     
     private func feedWithContent() -> [ImageStub] {
@@ -80,7 +60,7 @@ final class FeedSnapshotTests: XCTestCase {
     private func feedWithImageLoadError() -> [ImageStub] {
         [
             ImageStub(
-                description: "The East Side Gallery is an open-air gallery in Berlin. It consists of a series of murals painted directly...",
+                description: "The East Side Gallery is an open-air gallery in Berlin. It consists of a series of murals painted directly...zzz",
                 location: "East Side Gallery\nMemorial in Berlin, Germany",
                 image: nil
             ),
@@ -93,14 +73,14 @@ final class FeedSnapshotTests: XCTestCase {
     }
 }
 
-private extension FeedViewController {
+private extension ListViewController {
     func display(_ stubs: [ImageStub]) {
         let controllers = stubs.map {
             let controller = FeedCellController(delegate: $0, viewModel: $0.viewModel)
             $0.controller = controller
             return controller
         }
-        display(controllers)
+        display(controllers.map(CellController.init))
     }
 }
 

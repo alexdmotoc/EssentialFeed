@@ -17,22 +17,15 @@ enum FeedUIComposer {
     static func makeFeedController(
         with feedLoader: @escaping () -> AnyPublisher<[FeedItem], Error>,
         imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher
-    ) -> FeedViewController {
+    ) -> ListViewController {
+        
         let feedLoaderAdapter = FeedLoaderPresenterAdapter(loader: feedLoader)
+        let feedController = ListViewController.makeWith(title: FeedPresenter.title)
+        feedController.onRefresh = feedLoaderAdapter.load
         
-        let feedController = FeedViewController.makeWith(
-            title: FeedPresenter.title,
-            delegate: feedLoaderAdapter
-        )
+        let feedAdapter = FeedAdapter(controller: feedController, imageLoader: imageLoader)
         
-        let feedAdapter = FeedAdapter(
-            controller: feedController,
-            imageLoader: { url in
-                imageLoader(url).dispatchOnMainQueue()
-            }
-        )
-        
-        feedLoaderAdapter.presenter = ResourcePresenter<[FeedItem], FeedAdapter>(
+        feedLoaderAdapter.presenter = ResourcePresenter(
             loadingView: WeakRefVirtualProxy(feedController),
             resourceView: feedAdapter,
             errorView: WeakRefVirtualProxy(feedController), 
@@ -43,15 +36,11 @@ enum FeedUIComposer {
     }
 }
 
-private extension FeedViewController {
-    static func makeWith(
-        title: String,
-        delegate: FeedViewControllerDelegate
-    ) -> FeedViewController {
-        let bundle = Bundle(for: FeedViewController.self)
+private extension ListViewController {
+    static func makeWith(title: String) -> ListViewController {
+        let bundle = Bundle(for: ListViewController.self)
         let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
-        let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
-        feedController.delegate = delegate
+        let feedController = storyboard.instantiateInitialViewController() as! ListViewController
         feedController.title = title
         return feedController
     }

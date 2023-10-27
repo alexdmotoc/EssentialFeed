@@ -7,18 +7,18 @@
 
 import UIKit
 
-public final class FeedItemCell: UITableViewCell {
-    @IBOutlet private(set) public weak var descriptionLabel: UILabel!
-    @IBOutlet private(set) public weak var locationLabel: UILabel!
-    @IBOutlet private(set) public weak var locationContainer: UIView!
-    @IBOutlet private(set) public weak var feedImageContainer: UIView!
-    @IBOutlet private(set) public weak var feedImageView: UIImageView!
-    @IBOutlet private(set) public weak var retryButton: UIButton!
+final class FeedItemCell: UITableViewCell {
+    @IBOutlet private(set) weak var descriptionLabel: UILabel!
+    @IBOutlet private(set) weak var locationLabel: UILabel!
+    @IBOutlet private(set) weak var locationContainer: UIView!
+    @IBOutlet private(set) weak var feedImageContainer: UIView!
+    @IBOutlet private(set) weak var feedImageView: UIImageView!
+    @IBOutlet private(set) weak var retryButton: UIButton!
     
     var onRetry: (() -> Void)?
     var onPrepareForReuse: (() -> Void)?
     
-    public override func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
         onPrepareForReuse?()
     }
