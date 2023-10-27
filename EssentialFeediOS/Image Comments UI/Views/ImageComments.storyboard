@@ -15,31 +15,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="XXy-kn-fKf" customClass="ErrorView" customModule="EssentialFeediOS" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="393" height="68"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <subviews>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qaK-ng-mmU">
-                                    <rect key="frame" x="8" y="8" width="377" height="52"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                            </subviews>
-                            <color key="backgroundColor" systemColor="systemRedColor"/>
-                            <constraints>
-                                <constraint firstAttribute="bottom" secondItem="qaK-ng-mmU" secondAttribute="bottom" constant="8" id="0Pi-WT-h9I"/>
-                                <constraint firstItem="qaK-ng-mmU" firstAttribute="leading" secondItem="XXy-kn-fKf" secondAttribute="leading" constant="8" id="6AK-xL-OeZ"/>
-                                <constraint firstItem="qaK-ng-mmU" firstAttribute="top" secondItem="XXy-kn-fKf" secondAttribute="top" constant="8" id="a9b-5H-1mN"/>
-                                <constraint firstAttribute="trailing" secondItem="qaK-ng-mmU" secondAttribute="trailing" constant="8" id="xXA-qU-nij"/>
-                            </constraints>
-                            <connections>
-                                <outlet property="label" destination="qaK-ng-mmU" id="xHc-9v-c1Z"/>
-                            </connections>
-                        </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="ImageCommentCell" rowHeight="475" id="VJt-Ts-ssb" customClass="ImageCommentCell" customModule="EssentialFeediOS" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="118" width="393" height="475"/>
+                                <rect key="frame" x="0.0" y="50" width="393" height="475"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="VJt-Ts-ssb" id="5cx-Kq-428">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="475"/>
@@ -104,9 +82,6 @@
                             <action selector="refresh" destination="vRT-3d-J3P" eventType="valueChanged" id="QAr-Yx-ZwZ"/>
                         </connections>
                     </refreshControl>
-                    <connections>
-                        <outlet property="errorView" destination="XXy-kn-fKf" id="uCj-UV-aIK"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wsN-fs-gd6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -119,9 +94,6 @@
         </systemColor>
         <systemColor name="systemGroupedBackgroundColor">
             <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

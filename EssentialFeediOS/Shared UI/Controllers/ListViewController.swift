@@ -10,7 +10,7 @@ import EssentialFeed
 
 public class ListViewController: UITableViewController {
     
-    @IBOutlet private(set) public var errorView: ErrorView!
+    private(set) public lazy var errorView = ErrorView()
     
     private var models: [CellController] = [] {
         didSet { tableView.reloadData() }
@@ -23,7 +23,9 @@ public class ListViewController: UITableViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
+        tableView.tableHeaderView = errorView
+        
         onViewIsAppearing = { vc in
             vc.refresh()
             vc.onViewIsAppearing = nil
