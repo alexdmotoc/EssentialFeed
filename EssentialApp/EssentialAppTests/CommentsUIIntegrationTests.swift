@@ -53,19 +53,19 @@ final class CommentsUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoad(at: 0)
+        loader.completeCommentsLoad(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
         sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoad(at: 1)
+        loader.completeCommentsLoad(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
         sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoad(at: 2)
+        loader.completeCommentsLoad(at: 2)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
@@ -79,11 +79,11 @@ final class CommentsUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         try assertThat(sut, isRendering: [])
         
-        loader.completeFeedLoad(withFeed: [image1], at: 0)
+        loader.completeCommentsLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
         sut.simulateManualReload()
-        loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
+        loader.completeCommentsLoad(withFeed: [image1, image2, image3, image4], at: 1)
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
     
@@ -94,11 +94,11 @@ final class CommentsUIIntegrationTests: XCTestCase {
         
         sut.simulateAppearance()
         
-        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        loader.completeCommentsLoad(withFeed: [image1, image2], at: 0)
         try assertThat(sut, isRendering: [image1, image2])
         
         sut.simulateManualReload()
-        loader.completeFeedLoad(withFeed: [], at: 1)
+        loader.completeCommentsLoad(withFeed: [], at: 1)
         try assertThat(sut, isRendering: [])
     }
     
@@ -107,7 +107,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        loader.completeFeedLoad(withFeed: [image1], at: 0)
+        loader.completeCommentsLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
         sut.simulateManualReload()
@@ -122,7 +122,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         
         let exp = expectation(description: "wait for complete feed load")
         DispatchQueue.global().async {
-            loader.completeFeedLoad(withFeed: [self.makeImage()], at: 0)
+            loader.completeCommentsLoad(withFeed: [self.makeImage()], at: 0)
             exp.fulfill()
         }
         
@@ -223,7 +223,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
             return subject.eraseToAnyPublisher()
         }
         
-        func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
+        func completeCommentsLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
             feedPublishers[index].send(feed)
         }
         
