@@ -21,7 +21,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     func test_controller_hasTitle() {
         let (sut, _) = makeSUT()
         
-        XCTAssertEqual(sut.title, localized("FEED_VIEW_TITLE"))
+        XCTAssertEqual(sut.title, FeedPresenter.title)
     }
     
     func test_viewIsAppearingTwice_loadsTheFeedOnlyOnce() {
