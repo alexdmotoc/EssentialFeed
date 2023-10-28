@@ -83,7 +83,7 @@ extension ListViewController {
         tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
     }
     
-    func simulateManualFeedLoad() {
+    func simulateManualReload() {
         refreshControl?.simulateManualRefresh()
     }
     

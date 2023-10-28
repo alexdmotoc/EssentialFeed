@@ -13,38 +13,38 @@ import Combine
 
 final class CommentsUIIntegrationTests: XCTestCase {
     
-    func test_init_doesNotLoadFeed() {
+    func test_init_doesNotLoadComments() {
         let (_, loader) = makeSUT()
         
-        XCTAssertEqual(loader.feedLoadCount, 0)
+        XCTAssertEqual(loader.commentsLoadCount, 0)
     }
     
     func test_controller_hasTitle() {
         let (sut, _) = makeSUT()
         
-        XCTAssertEqual(sut.title, localized("FEED_VIEW_TITLE"))
+        XCTAssertEqual(sut.title, ImageCommentsPresenter.title)
     }
     
-    func test_viewIsAppearingTwice_loadsTheFeedOnlyOnce() {
+    func test_viewIsAppearingTwice_loadsTheCommentsOnlyOnce() {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
         sut.simulateAppearance()
         
-        XCTAssertEqual(loader.feedLoadCount, 1)
+        XCTAssertEqual(loader.commentsLoadCount, 1)
     }
     
-    func test_loadingFeed_requestsLoadFromLoader() {
+    func test_loadingComments_requestsLoadFromLoader() {
         let (sut, loader) = makeSUT()
         
         sut.simulateAppearance()
-        XCTAssertEqual(loader.feedLoadCount, 1, "On first appearance the feed is loaded once")
+        XCTAssertEqual(loader.commentsLoadCount, 1, "On first appearance the feed is loaded once")
         
-        sut.simulateManualFeedLoad()
-        XCTAssertEqual(loader.feedLoadCount, 2, "On manual refresh the feed is loaded again")
+        sut.simulateManualReload()
+        XCTAssertEqual(loader.commentsLoadCount, 2, "On manual refresh the feed is loaded again")
         
-        sut.simulateManualFeedLoad()
-        XCTAssertEqual(loader.feedLoadCount, 3, "On another manual refresh the feed is loaded again")
+        sut.simulateManualReload()
+        XCTAssertEqual(loader.commentsLoadCount, 3, "On another manual refresh the feed is loaded again")
     }
     
     func test_loadingIndicator_isShownWheneverALoadIsTriggered() {
@@ -56,13 +56,13 @@ final class CommentsUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 2)
@@ -82,7 +82,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
@@ -97,7 +97,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
         try assertThat(sut, isRendering: [image1, image2])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [], at: 1)
         try assertThat(sut, isRendering: [])
     }
@@ -110,7 +110,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoadWithError(at: 1)
         try assertThat(sut, isRendering: [image1])
     }
@@ -138,7 +138,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         loader.completeFeedLoadWithError(at: 0)
         XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(sut.errorMessage, nil)
     }
     
@@ -213,7 +213,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         private(set) var imageLoadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
         private(set) var cancelledImageLoad: [URL] = []
         var loadedImages: [URL] { imageLoadRequests.map { $0.url } }
-        var feedLoadCount: Int { feedPublishers.count }
+        var commentsLoadCount: Int { feedPublishers.count }
         
         // MARK: - FeedLoader
         

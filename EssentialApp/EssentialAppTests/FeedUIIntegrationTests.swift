@@ -39,10 +39,10 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         XCTAssertEqual(loader.feedLoadCount, 1, "On first appearance the feed is loaded once")
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 2, "On manual refresh the feed is loaded again")
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 3, "On another manual refresh the feed is loaded again")
     }
     
@@ -55,13 +55,13 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 2)
@@ -81,7 +81,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
@@ -96,7 +96,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
         try assertThat(sut, isRendering: [image1, image2])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [], at: 1)
         try assertThat(sut, isRendering: [])
     }
@@ -109,7 +109,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoadWithError(at: 1)
         try assertThat(sut, isRendering: [image1])
     }
@@ -373,7 +373,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoadWithError(at: 0)
         XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(sut.errorMessage, nil)
     }
     

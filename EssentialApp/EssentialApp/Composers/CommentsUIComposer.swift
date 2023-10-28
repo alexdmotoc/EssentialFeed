@@ -19,7 +19,7 @@ enum CommentsUIComposer {
     ) -> ListViewController {
         
         let feedLoaderAdapter = FeedLoaderPresenterAdapter(loader: feedLoader)
-        let feedController = ListViewController.makeWith(title: FeedPresenter.title)
+        let feedController = ListViewController.makeWith(title: ImageCommentsPresenter.title)
         feedController.onRefresh = feedLoaderAdapter.load
         
         let feedAdapter = FeedAdapter(controller: feedController, imageLoader: { _ in
