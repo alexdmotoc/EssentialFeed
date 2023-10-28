@@ -33,7 +33,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private lazy var localFeedImageLoader = LocalFeedImageDataLoader(store: store)
     
-    private let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
+    private let baseURL = URL(string: "https://ile-api.essentialdeveloper.com/essential-feed")!
+    
+    private lazy var navigationController = UINavigationController(
+        rootViewController: FeedUIComposer.makeFeedController(
+            with: makeRemoteFeedLoaderWithLocalFallback,
+            imageLoader: makeLocalFeedImageLoaderWithRemoteFallback,
+            selection: handleFeedItemSelection
+        )
+    )
     
     convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
         self.init()
@@ -50,12 +58,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func configureWindow() {
-        let feedController = FeedUIComposer.makeFeedController(
-            with: makeRemoteFeedLoaderWithLocalFallback,
-            imageLoader: makeLocalFeedImageLoaderWithRemoteFallback
-        )
-        
-        window?.rootViewController = UINavigationController(rootViewController: feedController)
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
     
@@ -63,9 +66,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         localFeedLoader.validateCache { _ in }
     }
     
+    // MARK: - Navigation
+    
+    private func handleFeedItemSelection(_ item: FeedItem) {
+        
+    }
+    
+    // MARK: - Factories
+    
     private func makeRemoteFeedLoaderWithLocalFallback() -> AnyPublisher<[FeedItem], Error> {
-        httpClient
-            .getPublisher(at: baseURL)
+        let url = FeedEndpoint.get.url(baseURL: baseURL)
+        return httpClient
+            .getPublisher(at: url)
             .tryMap(FeedItemMapper.map)
             .caching(to: localFeedLoader)
             .fallback(to: localFeedLoader.loadPublisher)

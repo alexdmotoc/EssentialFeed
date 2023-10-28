@@ -110,6 +110,10 @@ extension ListViewController {
         return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: feedSection)) as? FeedItemCell
     }
     
+    func simulateFeedCellTap(at index: Int) {
+        tableView.delegate?.tableView?(tableView, didSelectRowAt: IndexPath(row: index, section: feedSection))
+    }
+    
     @discardableResult
     func simulateCellIsVisible(at index: Int) -> FeedItemCell {
         let cell = feedCell(at: index)!

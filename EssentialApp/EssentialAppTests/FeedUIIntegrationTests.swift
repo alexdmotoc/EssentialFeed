@@ -390,15 +390,39 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
     }
     
+    func test_onImageCellTap_returnsTappedImageCell() {
+        let image1 = makeImage()
+        let image2 = makeImage()
+        var tappedImages: [FeedItem] = []
+        let (sut, loader) = makeSUT { tappedImages.append($0) }
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        
+        sut.simulateFeedCellTap(at: 0)
+        XCTAssertEqual(tappedImages, [image1])
+        
+        sut.simulateFeedCellTap(at: 1)
+        XCTAssertEqual(tappedImages, [image1, image2])
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {
         func display(_ viewModel: Any) {}
     }
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: ListViewController, loader: LoaderSpy) {
+    private func makeSUT(
+        selection: @escaping (FeedItem) -> Void = { _ in },
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> (sut: ListViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
-        let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader.loadPublisher)
+        let sut = FeedUIComposer.makeFeedController(
+            with: loader.loadPublisher,
+            imageLoader: loader.loadPublisher,
+            selection: selection
+        )
         checkIsDeallocated(sut: loader, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, loader)

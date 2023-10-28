@@ -16,11 +16,17 @@ public protocol FeedCellControllerDelegate {
 public final class FeedCellController: NSObject {
     private let delegate: FeedCellControllerDelegate
     private let viewModel: FeedImageViewModel
+    private let selection: () -> Void
     private var cell: FeedItemCell?
     
-    public init(delegate: FeedCellControllerDelegate, viewModel: FeedImageViewModel) {
+    public init(
+        delegate: FeedCellControllerDelegate,
+        viewModel: FeedImageViewModel,
+        selection: @escaping () -> Void
+    ) {
         self.delegate = delegate
         self.viewModel = viewModel
+        self.selection = selection
     }
 }
 
@@ -41,6 +47,10 @@ extension FeedCellController: UITableViewDataSource, UITableViewDelegate, UITabl
         cell?.onRetry = { [weak self] in self?.delegate.didRequestImage() }
         cell?.onPrepareForReuse = { [weak self] in self?.releaseCellReference() }
         return cell!
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selection()
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
