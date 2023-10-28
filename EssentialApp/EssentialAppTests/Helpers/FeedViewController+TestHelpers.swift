@@ -9,21 +9,9 @@ import Foundation
 import UIKit
 @testable import EssentialFeediOS
 
+// MARK: - iOS 17 support
+
 extension ListViewController {
-    var isShowingLoadingIndicator: Bool {
-        refreshControl?.isRefreshing ?? false
-    }
-    
-    var numberOfRenderedImages: Int {
-        tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: itemsSection)
-    }
-    
-    var errorMessage: String? {
-        errorView.message
-    }
-    
-    // MARK: - Initialization support
-    
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
@@ -55,55 +43,6 @@ extension ListViewController {
         refreshControl = spy
     }
     
-    // MARK: - Utility
-    
-    var itemsSection: Int { 0 }
-    
-    func itemCell(at index: Int) -> FeedItemCell? {
-        guard index < numberOfRenderedImages else { return nil }
-        let dataSource = tableView.dataSource
-        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: itemsSection)) as? FeedItemCell
-    }
-    
-    @discardableResult
-    func simulateCellIsVisible(at index: Int) -> FeedItemCell {
-        let cell = itemCell(at: index)!
-        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-        return cell
-    }
-    
-    @discardableResult
-    func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
-        let cell = itemCell(at: index)!
-        tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-        return cell
-    }
-    
-    func simulateCellIsRedisplayed(_ cell: FeedItemCell, at index: Int) {
-        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: itemsSection))
-    }
-    
-    func simulateManualReload() {
-        refreshControl?.simulateManualRefresh()
-    }
-    
-    func simulateCellPreload(at index: Int) {
-        tableView.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [IndexPath(row: index, section: itemsSection)])
-    }
-    
-    func simulateCancelCellPreload(at index: Int) {
-        simulateCellPreload(at: index)
-        tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: itemsSection)])
-    }
-    
-    func simulateErrorMessageTap() {
-        errorView.simulateTap()
-    }
-    
-    func renderedImageData(at index: Int) -> Data? {
-        simulateCellIsVisible(at: index).renderedImageData
-    }
-    
     private class UIRefreshControlSpy: UIRefreshControl {
         var _isRefreshing: Bool = false
         override var isRefreshing: Bool { _isRefreshing }
@@ -115,5 +54,90 @@ extension ListViewController {
         override func endRefreshing() {
             _isRefreshing = false
         }
+    }
+}
+
+// MARK: - General
+
+extension ListViewController {
+    var isShowingLoadingIndicator: Bool {
+        refreshControl?.isRefreshing ?? false
+    }
+    
+    var errorMessage: String? {
+        errorView.message
+    }
+    
+    func simulateManualReload() {
+        refreshControl?.simulateManualRefresh()
+    }
+    
+    func simulateErrorMessageTap() {
+        errorView.simulateTap()
+    }
+}
+
+// MARK: - Comments Utility
+
+extension ListViewController {
+    
+    var commentsSection: Int { 0 }
+    
+    var numberOfRenderedComments: Int {
+        tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: commentsSection)
+    }
+    
+    func commentCell(at index: Int) -> ImageCommentCell? {
+        guard index < numberOfRenderedComments else { return nil }
+        let dataSource = tableView.dataSource
+        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: commentsSection)) as? ImageCommentCell
+    }
+}
+
+// MARK: - Feed Image Utility
+
+extension ListViewController {
+    
+    var feedSection: Int { 0 }
+    
+    var numberOfRenderedImages: Int {
+        tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: feedSection)
+    }
+    
+    func feedCell(at index: Int) -> FeedItemCell? {
+        guard index < numberOfRenderedImages else { return nil }
+        let dataSource = tableView.dataSource
+        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: feedSection)) as? FeedItemCell
+    }
+    
+    @discardableResult
+    func simulateCellIsVisible(at index: Int) -> FeedItemCell {
+        let cell = feedCell(at: index)!
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: feedSection))
+        return cell
+    }
+    
+    @discardableResult
+    func simulateCellIsNotVisible(at index: Int) -> FeedItemCell {
+        let cell = feedCell(at: index)!
+        tableView.delegate?.tableView?(tableView, didEndDisplaying: cell, forRowAt: IndexPath(row: index, section: feedSection))
+        return cell
+    }
+    
+    func simulateCellIsRedisplayed(_ cell: FeedItemCell, at index: Int) {
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: index, section: feedSection))
+    }
+    
+    func simulateCellPreload(at index: Int) {
+        tableView.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [IndexPath(row: index, section: feedSection)])
+    }
+    
+    func simulateCancelCellPreload(at index: Int) {
+        simulateCellPreload(at: index)
+        tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: feedSection)])
+    }
+    
+    func renderedImageData(at index: Int) -> Data? {
+        simulateCellIsVisible(at: index).renderedImageData
     }
 }

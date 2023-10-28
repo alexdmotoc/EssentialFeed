@@ -428,7 +428,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) throws {
-        let itemCell = try XCTUnwrap(sut.itemCell(at: index), "Expected to retrieve cell at \(index)", file: file, line: line)
+        let itemCell = try XCTUnwrap(sut.feedCell(at: index), "Expected to retrieve cell at \(index)", file: file, line: line)
         XCTAssertEqual(itemCell.descriptionText, image.description, "Expected description to match", file: file, line: line)
         XCTAssertEqual(itemCell.isDescriptionHidden, image.description == nil, "Expected description to have same visibility", file: file, line: line)
         XCTAssertEqual(itemCell.locationText, image.location, "Expected location to match", file: file, line: line)
