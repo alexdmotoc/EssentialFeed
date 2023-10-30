@@ -162,6 +162,10 @@ extension ListViewController {
         tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: 0, section: feedLoadMoreSection))
     }
     
+    func simulateTapOnLoadMore() {
+        tableView.delegate?.tableView?(tableView, didSelectRowAt: IndexPath(row: 0, section: feedLoadMoreSection))
+    }
+    
     var isShowingLoadMoreFeedIndicator: Bool {
         return loadMoreFeedCell()?.isLoading == true
     }
