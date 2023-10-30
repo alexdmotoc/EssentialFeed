@@ -415,6 +415,9 @@ final class FeedUIIntegrationTests: XCTestCase {
         
         sut.simulateFeedLoadMoreAction()
         XCTAssertEqual(loader.feedLoadMoreCount, 1, "Load more is called after first load more action")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1, "Load more is not called while load is still in progress")
     }
     
     // MARK: - Helpers
