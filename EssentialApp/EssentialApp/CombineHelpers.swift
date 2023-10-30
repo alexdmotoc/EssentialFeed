@@ -19,6 +19,22 @@ extension Paginated {
         }
         .eraseToAnyPublisher()
     }
+    
+    init(items: [Item], loadMorePublisher: (() -> AnyPublisher<Self, Error>)?) {
+        self.init(items: items, loadMore: loadMorePublisher.map { publisher in
+            { completion in
+                publisher().subscribe(Subscribers.Sink(
+                    receiveCompletion: { result in
+                        if case let .failure(error) = result {
+                            completion(.failure(error))
+                        }
+                    }, receiveValue: { value in
+                        completion(.success(value))
+                    }
+                ))
+            }
+        })
+    }
 }
 
 // MARK: - HTTPClient
@@ -147,7 +163,7 @@ extension DispatchQueue {
             guard isMainQueue() else {
                 return DispatchQueue.main.schedule(options: options, action)
             }
-                        
+            
             action()
         }
         
