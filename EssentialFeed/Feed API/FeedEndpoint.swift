@@ -17,7 +17,7 @@ public enum FeedEndpoint {
             var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
             components?.queryItems = [
                 URLQueryItem(name: "limit", value: "10"),
-                item.map { URLQueryItem(name: "afer_id", value: $0.id.uuidString) }
+                item.map { URLQueryItem(name: "after_id", value: $0.id.uuidString) }
             ].compactMap { $0 }
             return components!.url!
         }
