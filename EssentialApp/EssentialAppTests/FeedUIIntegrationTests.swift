@@ -21,7 +21,7 @@ final class FeedUIIntegrationTests: XCTestCase {
     func test_controller_hasTitle() {
         let (sut, _) = makeSUT()
         
-        XCTAssertEqual(sut.title, localized("FEED_VIEW_TITLE"))
+        XCTAssertEqual(sut.title, FeedPresenter.title)
     }
     
     func test_viewIsAppearingTwice_loadsTheFeedOnlyOnce() {
@@ -39,10 +39,10 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         XCTAssertEqual(loader.feedLoadCount, 1, "On first appearance the feed is loaded once")
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 2, "On manual refresh the feed is loaded again")
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 3, "On another manual refresh the feed is loaded again")
     }
     
@@ -55,13 +55,13 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
         loader.completeFeedLoad(at: 2)
@@ -81,7 +81,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
         try assertThat(sut, isRendering: [image1, image2, image3, image4])
     }
@@ -96,7 +96,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
         try assertThat(sut, isRendering: [image1, image2])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoad(withFeed: [], at: 1)
         try assertThat(sut, isRendering: [])
     }
@@ -109,7 +109,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoad(withFeed: [image1], at: 0)
         try assertThat(sut, isRendering: [image1])
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         loader.completeFeedLoadWithError(at: 1)
         try assertThat(sut, isRendering: [image1])
     }
@@ -373,7 +373,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         loader.completeFeedLoadWithError(at: 0)
         XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
         
-        sut.simulateManualFeedLoad()
+        sut.simulateManualReload()
         XCTAssertEqual(sut.errorMessage, nil)
     }
     
@@ -390,15 +390,39 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
     }
     
+    func test_onImageCellTap_returnsTappedImageCell() {
+        let image1 = makeImage()
+        let image2 = makeImage()
+        var tappedImages: [FeedItem] = []
+        let (sut, loader) = makeSUT { tappedImages.append($0) }
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        
+        sut.simulateFeedCellTap(at: 0)
+        XCTAssertEqual(tappedImages, [image1])
+        
+        sut.simulateFeedCellTap(at: 1)
+        XCTAssertEqual(tappedImages, [image1, image2])
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {
         func display(_ viewModel: Any) {}
     }
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: ListViewController, loader: LoaderSpy) {
+    private func makeSUT(
+        selection: @escaping (FeedItem) -> Void = { _ in },
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> (sut: ListViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
-        let sut = FeedUIComposer.makeFeedController(with: loader.loadPublisher, imageLoader: loader.loadPublisher)
+        let sut = FeedUIComposer.makeFeedController(
+            with: loader.loadPublisher,
+            imageLoader: loader.loadPublisher,
+            selection: selection
+        )
         checkIsDeallocated(sut: loader, file: file, line: line)
         checkIsDeallocated(sut: sut, file: file, line: line)
         return (sut, loader)
@@ -428,7 +452,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) throws {
-        let itemCell = try XCTUnwrap(sut.itemCell(at: index), "Expected to retrieve cell at \(index)", file: file, line: line)
+        let itemCell = try XCTUnwrap(sut.feedCell(at: index), "Expected to retrieve cell at \(index)", file: file, line: line)
         XCTAssertEqual(itemCell.descriptionText, image.description, "Expected description to match", file: file, line: line)
         XCTAssertEqual(itemCell.isDescriptionHidden, image.description == nil, "Expected description to have same visibility", file: file, line: line)
         XCTAssertEqual(itemCell.locationText, image.location, "Expected location to match", file: file, line: line)

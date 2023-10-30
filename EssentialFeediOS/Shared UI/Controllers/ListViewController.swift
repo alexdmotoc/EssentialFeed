@@ -96,6 +96,11 @@ extension ListViewController: ResourceErrorView {
 // MARK: - UITableViewDelegate
 
 extension ListViewController {
+    public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let controller = cellController(at: indexPath)
+        controller?.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
+    }
+    
     public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let controller = cellController(at: indexPath)
         controller?.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: indexPath)
