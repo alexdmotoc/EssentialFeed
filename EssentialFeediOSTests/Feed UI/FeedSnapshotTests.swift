@@ -31,6 +31,15 @@ final class FeedSnapshotTests: XCTestCase {
         assert(snapshot: sut.snapshot(for: .iPhone(style: .dark, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_IMAGE_LOAD_ERROR_dark_extraExtraExtraLarge")
     }
     
+    func test_feedWithLoadMoreIndicator() {
+        let sut = makeSUT()
+        
+        sut.display(feedWithLoadMoreIndicator())
+        
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .light)), named: "FEED_WITH_LOAD_MORE_light")
+        assert(snapshot: sut.snapshot(for: .iPhone(style: .dark)), named: "FEED_WITH_LOAD_MORE_dark")
+    }
+    
     // MARK: - Helpers
     private func makeSUT() -> ListViewController {
         let bundle = Bundle(for: ListViewController.self)
@@ -40,6 +49,19 @@ final class FeedSnapshotTests: XCTestCase {
         controller.tableView.showsVerticalScrollIndicator = false
         controller.tableView.showsHorizontalScrollIndicator = false
         return controller
+    }
+    
+    private func feedWithLoadMoreIndicator() -> [CellController] {
+        let contentStub = feedWithContent().last!
+        let feedCellController = FeedCellController(delegate: contentStub, viewModel: contentStub.viewModel, selection: {})
+        contentStub.controller = feedCellController
+        
+        let loadMore = LoadMoreCellController()
+        loadMore.display(.init(isLoading: true))
+        return [
+            CellController(id: UUID(), dataSource: feedCellController),
+            CellController(id: UUID(), dataSource: loadMore)
+        ]
     }
     
     private func feedWithContent() -> [ImageStub] {
