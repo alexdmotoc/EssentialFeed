@@ -9,29 +9,51 @@ import Foundation
 import EssentialFeed
 import EssentialFeediOS
 import Combine
+@testable import EssentialApp
 
 extension FeedUIIntegrationTests {
     class LoaderSpy: FeedImageDataLoader {
-        private var feedPublishers: [PassthroughSubject<[FeedItem], Error>] = []
+        private var feedPublishers: [PassthroughSubject<Paginated<FeedItem>, Error>] = []
+        private var loadMorePublishers: [PassthroughSubject<Paginated<FeedItem>, Error>] = []
+        
         private(set) var imageLoadRequests: [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)] = []
         private(set) var cancelledImageLoad: [URL] = []
         var loadedImages: [URL] { imageLoadRequests.map { $0.url } }
         var feedLoadCount: Int { feedPublishers.count }
+        var feedLoadMoreCount: Int { loadMorePublishers.count }
         
         // MARK: - FeedLoader
         
-        func loadPublisher() -> AnyPublisher<[FeedItem], Error> {
-            let subject = PassthroughSubject<[FeedItem], Error>()
+        func loadPublisher() -> AnyPublisher<Paginated<FeedItem>, Error> {
+            let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
             feedPublishers.append(subject)
             return subject.eraseToAnyPublisher()
         }
         
         func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
-            feedPublishers[index].send(feed)
+            feedPublishers[index].send(Paginated(items: feed, loadMorePublisher: { [weak self] in
+                let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
+                self?.loadMorePublishers.append(subject)
+                return subject.eraseToAnyPublisher()
+            }))
         }
         
         func completeFeedLoadWithError(at index: Int = 0) {
             feedPublishers[index].send(completion: .failure(NSError(domain: "mock", code: 0)))
+        }
+        
+        func completeLoadMore(with feed: [FeedItem] = [], lastPage: Bool = false, at index: Int = 0) {
+            loadMorePublishers[index].send(
+                Paginated(items: feed, loadMorePublisher: lastPage ? nil : { [weak self] in
+                    let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
+                    self?.loadMorePublishers.append(subject)
+                    return subject.eraseToAnyPublisher()
+                })
+            )
+        }
+        
+        func completeLoadMoreWithError(at index: Int = 0) {
+            loadMorePublishers[index].send(completion: .failure(NSError(domain: "mock", code: 0)))
         }
         
         // MARK: - FeedImageDataLoader

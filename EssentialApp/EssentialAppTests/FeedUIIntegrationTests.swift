@@ -78,12 +78,16 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateAppearance()
         try assertThat(sut, isRendering: [])
         
-        loader.completeFeedLoad(withFeed: [image1], at: 0)
-        try assertThat(sut, isRendering: [image1])
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        try assertThat(sut, isRendering: [image1, image2])
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMore(with: [image1, image2, image3, image4], at: 0)
+        try assertThat(sut, isRendering: [image1, image2, image3, image4])
         
         sut.simulateManualReload()
-        loader.completeFeedLoad(withFeed: [image1, image2, image3, image4], at: 1)
-        try assertThat(sut, isRendering: [image1, image2, image3, image4])
+        loader.completeFeedLoad(withFeed: [image1, image2], at: 1)
+        try assertThat(sut, isRendering: [image1, image2])
     }
     
     func test_loadFeed_rendersEmptyFeedCorrectlyAfterPreviouslyRenderingImages() throws {
@@ -93,7 +97,11 @@ final class FeedUIIntegrationTests: XCTestCase {
         
         sut.simulateAppearance()
         
-        loader.completeFeedLoad(withFeed: [image1, image2], at: 0)
+        loader.completeFeedLoad(withFeed: [image1], at: 0)
+        try assertThat(sut, isRendering: [image1])
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMore(with: [image1, image2], at: 0)
         try assertThat(sut, isRendering: [image1, image2])
         
         sut.simulateManualReload()
@@ -111,6 +119,10 @@ final class FeedUIIntegrationTests: XCTestCase {
         
         sut.simulateManualReload()
         loader.completeFeedLoadWithError(at: 1)
+        try assertThat(sut, isRendering: [image1])
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMoreWithError()
         try assertThat(sut, isRendering: [image1])
     }
     
@@ -348,6 +360,22 @@ final class FeedUIIntegrationTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
+    func test_loadMore_dispatchesWorkOnMainThread() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        sut.simulateFeedLoadMoreAction()
+        
+        let exp = expectation(description: "wait for complete feed load")
+        DispatchQueue.global().async {
+            loader.completeLoadMore(with: [self.makeImage()])
+            exp.fulfill()
+        }
+        
+        wait(for: [exp], timeout: 1)
+    }
+    
     func test_imageLoading_dispatchesWorkOnMainThread() {
         let (sut, loader) = makeSUT()
         
@@ -371,7 +399,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadWithError(at: 0)
-        XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
+        XCTAssertEqual(sut.errorMessage, loadError())
         
         sut.simulateManualReload()
         XCTAssertEqual(sut.errorMessage, nil)
@@ -384,7 +412,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadWithError(at: 0)
-        XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
+        XCTAssertEqual(sut.errorMessage, loadError())
         
         sut.simulateErrorMessageTap()
         XCTAssertEqual(sut.errorMessage, nil)
@@ -404,6 +432,87 @@ final class FeedUIIntegrationTests: XCTestCase {
         
         sut.simulateFeedCellTap(at: 1)
         XCTAssertEqual(tappedImages, [image1, image2])
+    }
+    
+    func test_loadMore_requestsLoadMoreFromLoader() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        XCTAssertEqual(loader.feedLoadMoreCount, 0, "After feed completes load more is not fired")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1, "Load more is called after first load more action")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1, "Load more is not called while load is still in progress")
+        
+        loader.completeLoadMore(lastPage: false, at: 0)
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 2, "Expected request after load more completed with more pages")
+        
+        loader.completeLoadMoreWithError(at: 1)
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 3, "Expected request after load more failure")
+        
+        loader.completeLoadMore(lastPage: true, at: 2)
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 3, "Expected no request after loading all pages")
+    }
+    
+    func test_loadingMoreIndicator_isVisibleWhileLoadingMore() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        XCTAssertFalse(sut.isShowingLoadMoreFeedIndicator, "Expected no loading indicator once view is loaded")
+        
+        loader.completeFeedLoad(at: 0)
+        XCTAssertFalse(sut.isShowingLoadMoreFeedIndicator, "Expected no loading indicator once loading completes successfully")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertTrue(sut.isShowingLoadMoreFeedIndicator, "Expected loading indicator on load more action")
+        
+        loader.completeLoadMore(at: 0)
+        XCTAssertFalse(sut.isShowingLoadMoreFeedIndicator, "Expected no loading indicator once user initiated loading completes successfully")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertTrue(sut.isShowingLoadMoreFeedIndicator, "Expected loading indicator on second load more action")
+        
+        loader.completeLoadMoreWithError(at: 1)
+        XCTAssertFalse(sut.isShowingLoadMoreFeedIndicator, "Expected no loading indicator once user initiated loading completes with error")
+    }
+    
+    func test_loadMore_showsError() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        XCTAssertEqual(sut.loadMoreError, nil)
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMoreWithError()
+        XCTAssertEqual(sut.loadMoreError, loadError())
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(sut.loadMoreError, nil)
+    }
+    
+    func test_tapOnLoadMore_reloadsWhileErrorIsDisplayed() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        XCTAssertEqual(loader.feedLoadMoreCount, 0)
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1)
+        
+        sut.simulateTapOnLoadMore()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1)
+        
+        loader.completeLoadMoreWithError()
+        sut.simulateTapOnLoadMore()
+        XCTAssertEqual(loader.feedLoadMoreCount, 2)
     }
     
     // MARK: - Helpers
@@ -465,5 +574,9 @@ final class FeedUIIntegrationTests: XCTestCase {
     
     private func executeRunLoopToCleanUpReferences() {
         RunLoop.current.run(until: Date())
+    }
+    
+    private func loadError() -> String {
+        return ResourcePresenter<Any, DummyView>.loadError
     }
 }

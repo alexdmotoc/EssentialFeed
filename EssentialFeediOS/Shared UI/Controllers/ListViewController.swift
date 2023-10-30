@@ -46,10 +46,12 @@ public class ListViewController: UITableViewController {
         onViewIsAppearing?(self)
     }
     
-    public func display(_ models: [CellController]) {
+    public func display(_ sections: [CellController]...) {
         var snapshot = NSDiffableDataSourceSnapshot<Int, CellController>()
-        snapshot.appendSections([0])
-        snapshot.appendItems(models)
+        sections.enumerated().forEach { section, models in
+            snapshot.appendSections([section])
+            snapshot.appendItems(models, toSection: section)
+        }
         dataSource.applySnapshotUsingReloadData(snapshot)
     }
     

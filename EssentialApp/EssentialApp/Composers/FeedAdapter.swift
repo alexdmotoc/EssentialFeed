@@ -12,6 +12,7 @@ import EssentialFeediOS
 final class FeedAdapter: ResourceView {
     
     private typealias FeedItemPresentationAdapter = ResourceLoaderPresenterAdapter<Data, WeakRefVirtualProxy<FeedCellController>>
+    private typealias LoadMorePresentationAdapter = ResourceLoaderPresenterAdapter<Paginated<FeedItem>, FeedAdapter>
     
     private weak var controller: ListViewController?
     private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
@@ -27,8 +28,8 @@ final class FeedAdapter: ResourceView {
         self.selection = selection
     }
     
-    func display(_ viewModel: FeedViewModel) {
-        controller?.display(viewModel.feed.map { model in
+    func display(_ viewModel: Paginated<FeedItem>) {
+        let feedSection: [CellController] = viewModel.items.map { model in
             let adapter = FeedItemPresentationAdapter(loader: { [imageLoader] in
                 imageLoader(model.imageURL)
             })
@@ -47,7 +48,24 @@ final class FeedAdapter: ResourceView {
                 mapper: Data.tryMap
             )
             return CellController(id: model, dataSource: view)
-        })
+        }
+        
+        guard let loadMorePublisher = viewModel.loadMorePublisher() else {
+            controller?.display(feedSection)
+            return
+        }
+        
+        let loadMoreAdapter = LoadMorePresentationAdapter(loader: { loadMorePublisher } )
+        let loadMore = LoadMoreCellController(callback: loadMoreAdapter.load)
+        
+        loadMoreAdapter.presenter = ResourcePresenter(
+            loadingView: WeakRefVirtualProxy(loadMore),
+            resourceView: self,
+            errorView: WeakRefVirtualProxy(loadMore)
+        )
+        
+        let loadMoreSection = [CellController(id: UUID(), dataSource: loadMore)]
+        controller?.display(feedSection, loadMoreSection)
     }
 }
 

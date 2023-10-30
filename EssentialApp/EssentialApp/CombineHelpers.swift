@@ -9,6 +9,34 @@ import Foundation
 import Combine
 import EssentialFeed
 
+// MARK: - Paginated
+
+extension Paginated {
+    func loadMorePublisher() -> AnyPublisher<Self, Error>? {
+        guard let loadMore else { return nil }
+        return Deferred {
+            Future(loadMore)
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    init(items: [Item], loadMorePublisher: (() -> AnyPublisher<Self, Error>)?) {
+        self.init(items: items, loadMore: loadMorePublisher.map { publisher in
+            { completion in
+                publisher().subscribe(Subscribers.Sink(
+                    receiveCompletion: { result in
+                        if case let .failure(error) = result {
+                            completion(.failure(error))
+                        }
+                    }, receiveValue: { value in
+                        completion(.success(value))
+                    }
+                ))
+            }
+        })
+    }
+}
+
 // MARK: - HTTPClient
 
 extension HTTPClient {
@@ -73,8 +101,12 @@ extension LocalFeedLoader {
     }
 }
 
-extension Publisher where Output == [FeedItem] {
-    func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure> {
+extension Publisher {
+    func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure> where Output == [FeedItem] {
+        handleEvents(receiveOutput: cache.saveIgnoringResult).eraseToAnyPublisher()
+    }
+    
+    func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure> where Output == Paginated<FeedItem> {
         handleEvents(receiveOutput: cache.saveIgnoringResult).eraseToAnyPublisher()
     }
 }
@@ -82,6 +114,10 @@ extension Publisher where Output == [FeedItem] {
 private extension FeedCache {
     func saveIgnoringResult(_ feed: [FeedItem]) {
         save(feed) { _ in }
+    }
+    
+    func saveIgnoringResult(_ feed: Paginated<FeedItem>) {
+        saveIgnoringResult(feed.items)
     }
 }
 
@@ -135,7 +171,7 @@ extension DispatchQueue {
             guard isMainQueue() else {
                 return DispatchQueue.main.schedule(options: options, action)
             }
-                        
+            
             action()
         }
         
