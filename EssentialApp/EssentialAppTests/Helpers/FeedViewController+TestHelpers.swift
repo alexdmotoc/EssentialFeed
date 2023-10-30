@@ -75,6 +75,19 @@ extension ListViewController {
     func simulateErrorMessageTap() {
         errorView.simulateTap()
     }
+    
+    func numberOfRows(in section: Int) -> Int {
+        tableView.numberOfSections > section ? tableView.numberOfRows(inSection: section) : 0
+    }
+    
+    func cell(row: Int, section: Int) -> UITableViewCell? {
+        guard numberOfRows(in: section) > row else {
+            return nil
+        }
+        let ds = tableView.dataSource
+        let index = IndexPath(row: row, section: section)
+        return ds?.tableView(tableView, cellForRowAt: index)
+    }
 }
 
 // MARK: - Comments Utility
@@ -88,9 +101,7 @@ extension ListViewController {
     }
     
     func commentCell(at index: Int) -> ImageCommentCell? {
-        guard index < numberOfRenderedComments else { return nil }
-        let dataSource = tableView.dataSource
-        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: commentsSection)) as? ImageCommentCell
+        cell(row: index, section: commentsSection) as? ImageCommentCell
     }
 }
 
@@ -99,15 +110,14 @@ extension ListViewController {
 extension ListViewController {
     
     var feedSection: Int { 0 }
+    var feedLoadMoreSection: Int { 1 }
     
     var numberOfRenderedImages: Int {
         tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: feedSection)
     }
     
     func feedCell(at index: Int) -> FeedItemCell? {
-        guard index < numberOfRenderedImages else { return nil }
-        let dataSource = tableView.dataSource
-        return dataSource?.tableView(tableView, cellForRowAt: IndexPath(row: index, section: feedSection)) as? FeedItemCell
+        cell(row: index, section: feedSection) as? FeedItemCell
     }
     
     func simulateFeedCellTap(at index: Int) {
@@ -139,6 +149,11 @@ extension ListViewController {
     func simulateCancelCellPreload(at index: Int) {
         simulateCellPreload(at: index)
         tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: feedSection)])
+    }
+    
+    func simulateFeedLoadMoreAction() {
+        guard let cell = cell(row: 0, section: feedLoadMoreSection) else  { return }
+        tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: 0, section: feedLoadMoreSection))
     }
     
     func renderedImageData(at index: Int) -> Data? {

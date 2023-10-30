@@ -406,6 +406,17 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(tappedImages, [image1, image2])
     }
     
+    func test_loadMore_requestsLoadMoreFromLoader() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        XCTAssertEqual(loader.feedLoadMoreCount, 0, "After feed completes load more is not fired")
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(loader.feedLoadMoreCount, 1, "Load more is called after first load more action")
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {

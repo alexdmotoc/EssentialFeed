@@ -8,7 +8,8 @@
 import Foundation
 
 public struct Paginated<Item> {
-    public typealias LoadMore = (Result<Self, Error>) -> Void
+    public typealias LoadMoreCompletion = (Result<Self, Error>) -> Void
+    public typealias LoadMore = (@escaping LoadMoreCompletion) -> Void
     
     public let items: [Item]
     public let loadMore: LoadMore?

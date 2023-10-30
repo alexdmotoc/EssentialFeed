@@ -18,6 +18,8 @@ extension FeedUIIntegrationTests {
         var loadedImages: [URL] { imageLoadRequests.map { $0.url } }
         var feedLoadCount: Int { feedPublishers.count }
         
+        private(set) var feedLoadMoreCount = 0
+        
         // MARK: - FeedLoader
         
         func loadPublisher() -> AnyPublisher<Paginated<FeedItem>, Error> {
@@ -27,7 +29,11 @@ extension FeedUIIntegrationTests {
         }
         
         func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
-            feedPublishers[index].send(Paginated(items: feed))
+            feedPublishers[index].send(
+                Paginated(items: feed, loadMore: { [weak self] _ in
+                    self?.feedLoadMoreCount += 1
+                })
+            )
         }
         
         func completeFeedLoadWithError(at index: Int = 0) {
