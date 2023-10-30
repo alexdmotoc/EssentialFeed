@@ -33,8 +33,7 @@ enum FeedUIComposer {
         feedLoaderAdapter.presenter = ResourcePresenter(
             loadingView: WeakRefVirtualProxy(feedController),
             resourceView: feedAdapter,
-            errorView: WeakRefVirtualProxy(feedController), 
-            mapper: { $0 }
+            errorView: WeakRefVirtualProxy(feedController)
         )
         
         return feedController
