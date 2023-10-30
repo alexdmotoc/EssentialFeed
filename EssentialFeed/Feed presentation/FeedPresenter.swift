@@ -17,8 +17,4 @@ public final class FeedPresenter {
             comment: "The title of the main screen"
         )
     }
-    
-    public static func map(_ feedItems: [FeedItem]) -> FeedViewModel {
-        .init(feed: feedItems)
-    }
 }
