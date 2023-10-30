@@ -399,7 +399,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadWithError(at: 0)
-        XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
+        XCTAssertEqual(sut.errorMessage, loadError())
         
         sut.simulateManualReload()
         XCTAssertEqual(sut.errorMessage, nil)
@@ -412,7 +412,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadWithError(at: 0)
-        XCTAssertEqual(sut.errorMessage, ResourcePresenter<Any, DummyView>.loadError)
+        XCTAssertEqual(sut.errorMessage, loadError())
         
         sut.simulateErrorMessageTap()
         XCTAssertEqual(sut.errorMessage, nil)
@@ -482,6 +482,21 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertFalse(sut.isShowingLoadMoreFeedIndicator, "Expected no loading indicator once user initiated loading completes with error")
     }
     
+    func test_loadMore_showsError() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad()
+        XCTAssertEqual(sut.loadMoreError, nil)
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMoreWithError()
+        XCTAssertEqual(sut.loadMoreError, loadError())
+        
+        sut.simulateFeedLoadMoreAction()
+        XCTAssertEqual(sut.loadMoreError, nil)
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {
@@ -541,5 +556,9 @@ final class FeedUIIntegrationTests: XCTestCase {
     
     private func executeRunLoopToCleanUpReferences() {
         RunLoop.current.run(until: Date())
+    }
+    
+    private func loadError() -> String {
+        return ResourcePresenter<Any, DummyView>.loadError
     }
 }
