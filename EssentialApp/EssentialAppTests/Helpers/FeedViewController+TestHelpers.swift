@@ -105,7 +105,7 @@ extension ListViewController {
     }
 }
 
-// MARK: - Feed Image Utility
+// MARK: - Feed Utility
 
 extension ListViewController {
     
@@ -151,12 +151,22 @@ extension ListViewController {
         tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [IndexPath(row: index, section: feedSection)])
     }
     
+    func renderedImageData(at index: Int) -> Data? {
+        simulateCellIsVisible(at: index).renderedImageData
+    }
+    
+    // MARK: - Load more
+    
     func simulateFeedLoadMoreAction() {
-        guard let cell = cell(row: 0, section: feedLoadMoreSection) else  { return }
+        guard let cell = loadMoreFeedCell() else  { return }
         tableView.delegate?.tableView?(tableView, willDisplay: cell, forRowAt: IndexPath(row: 0, section: feedLoadMoreSection))
     }
     
-    func renderedImageData(at index: Int) -> Data? {
-        simulateCellIsVisible(at: index).renderedImageData
+    var isShowingLoadMoreFeedIndicator: Bool {
+        return loadMoreFeedCell()?.isLoading == true
+    }
+    
+    private func loadMoreFeedCell() -> LoadMoreCell? {
+        cell(row: 0, section: feedLoadMoreSection) as? LoadMoreCell
     }
 }
