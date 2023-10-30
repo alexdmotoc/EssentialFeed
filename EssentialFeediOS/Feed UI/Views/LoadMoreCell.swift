@@ -17,10 +17,27 @@ final class LoadMoreCell: UITableViewCell {
         NSLayoutConstraint.activate([
             indicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             indicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            indicator.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            contentView.bottomAnchor.constraint(equalTo: indicator.bottomAnchor, constant: 8)
+            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 40)
         ])
         return indicator
+    }()
+    
+    private lazy var messageLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .tertiaryLabel
+        label.numberOfLines = 0
+        label.font = .preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            contentView.trailingAnchor.constraint(equalTo: label.trailingAnchor, constant: 8),
+            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            contentView.bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 8)
+        ])
+        return label
     }()
     
     var isLoading: Bool {
@@ -32,6 +49,11 @@ final class LoadMoreCell: UITableViewCell {
                 activityIndicator.stopAnimating()
             }
         }
+    }
+    
+    var message: String? {
+        get { messageLabel.text }
+        set { messageLabel.text = newValue }
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

@@ -200,6 +200,9 @@
 		874883C82AEFD53300C34B33 /* LoadMoreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreCell.swift; sourceTree = "<group>"; };
 		874883CA2AEFD58300C34B33 /* FEED_WITH_LOAD_MORE_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FEED_WITH_LOAD_MORE_light.png; sourceTree = "<group>"; };
 		874883CB2AEFD58300C34B33 /* FEED_WITH_LOAD_MORE_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FEED_WITH_LOAD_MORE_dark.png; sourceTree = "<group>"; };
+		874883CC2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FEED_WITH_LOAD_MORE_ERROR_dark.png; sourceTree = "<group>"; };
+		874883CD2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_dark_extraExtraExtraLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FEED_WITH_LOAD_MORE_ERROR_dark_extraExtraExtraLarge.png; sourceTree = "<group>"; };
+		874883CE2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FEED_WITH_LOAD_MORE_ERROR_light.png; sourceTree = "<group>"; };
 		875D1FDA2A7A625E00B9210B /* SharedTestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTestUtils.swift; sourceTree = "<group>"; };
 		875D1FDC2A7A76C000B9210B /* URLSessionHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClient.swift; sourceTree = "<group>"; };
 		875D1FE22A7A7CD100B9210B /* EssentialFeedAPIEndToEndTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedAPIEndToEndTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -451,6 +454,9 @@
 		8718AAC82AEBCB7900908699 /* snapshots */ = {
 			isa = PBXGroup;
 			children = (
+				874883CD2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_dark_extraExtraExtraLarge.png */,
+				874883CC2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_dark.png */,
+				874883CE2AEFDACE00C34B33 /* FEED_WITH_LOAD_MORE_ERROR_light.png */,
 				874883CB2AEFD58300C34B33 /* FEED_WITH_LOAD_MORE_dark.png */,
 				874883CA2AEFD58300C34B33 /* FEED_WITH_LOAD_MORE_light.png */,
 				8718AACA2AEBCB7900908699 /* FEED_WITH_CONTENT_dark.png */,
