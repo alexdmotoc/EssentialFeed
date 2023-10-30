@@ -12,10 +12,10 @@ import Combine
 
 enum FeedUIComposer {
     
-    private typealias FeedLoaderPresenterAdapter = ResourceLoaderPresenterAdapter<[FeedItem], FeedAdapter>
+    private typealias FeedLoaderPresenterAdapter = ResourceLoaderPresenterAdapter<Paginated<FeedItem>, FeedAdapter>
     
     static func makeFeedController(
-        with feedLoader: @escaping () -> AnyPublisher<[FeedItem], Error>,
+        with feedLoader: @escaping () -> AnyPublisher<Paginated<FeedItem>, Error>,
         imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher,
         selection: @escaping (FeedItem) -> Void
     ) -> ListViewController {
@@ -34,7 +34,7 @@ enum FeedUIComposer {
             loadingView: WeakRefVirtualProxy(feedController),
             resourceView: feedAdapter,
             errorView: WeakRefVirtualProxy(feedController), 
-            mapper: FeedPresenter.map
+            mapper: { $0 }
         )
         
         return feedController
