@@ -69,10 +69,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: - Navigation
     
     private func handleFeedItemSelection(_ item: FeedItem) {
-        
+        let controller = CommentsUIComposer.makeCommentsController(with: { [unowned self] in makeCommentsLoader(item) })
+        navigationController.pushViewController(controller, animated: true)
     }
     
     // MARK: - Factories
+    
+    private func makeCommentsLoader(_ item: FeedItem) -> AnyPublisher<[ImageComment], Error> {
+        let url = ImageCommentsEndpoont.get(item.id).url(baseURL: baseURL)
+        return httpClient
+            .getPublisher(at: url)
+            .tryMap(ImageCommentsMapper.map)
+            .eraseToAnyPublisher()
+    }
     
     private func makeRemoteFeedLoaderWithLocalFallback() -> AnyPublisher<[FeedItem], Error> {
         let url = FeedEndpoint.get.url(baseURL: baseURL)

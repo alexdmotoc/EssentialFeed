@@ -77,7 +77,9 @@ final class FeedAcceptanceTests: XCTestCase {
         feed.simulateFeedCellTap(at: 0)
         RunLoop.current.run(until: Date())
         
-        return feed.navigationController?.topViewController as! ListViewController
+        let comments = feed.navigationController?.topViewController as! ListViewController
+        comments.simulateAppearance()
+        return comments
     }
     
     private func enterBackground(with store: InMemoryFeedStore) {
