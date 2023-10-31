@@ -10,6 +10,7 @@ import EssentialFeediOS
 import EssentialFeed
 import CoreData
 import Combine
+import os
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -24,7 +25,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }()
     
     private lazy var store: FeedStore & FeedImageDataStore = {
-        try! CoreDataFeedStore(storeURL: storeURL)
+        do {
+            return try CoreDataFeedStore(storeURL: storeURL)
+        } catch {
+            assertionFailure("Failed to instantiate CoreData store with error: \(error.localizedDescription)")
+            logger.fault("Failed to instantiate CoreData store with error: \(error.localizedDescription)")
+            return NullStore()
+        }
     }()
     
     private lazy var localFeedLoader: LocalFeedLoader = {
@@ -42,6 +49,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             selection: handleFeedItemSelection
         )
     )
+    
+    private lazy var logger = Logger(subsystem: "com.alexdmotoc.EssentialFeed", category: "main")
     
     convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
         self.init()

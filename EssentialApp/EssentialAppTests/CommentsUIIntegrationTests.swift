@@ -41,8 +41,13 @@ final class CommentsUIIntegrationTests: XCTestCase {
         XCTAssertEqual(loader.commentsLoadCount, 1, "On first appearance the comments are loaded once")
         
         sut.simulateManualReload()
+        XCTAssertEqual(loader.commentsLoadCount, 1, "On manual refresh the comments are NOT loaded again until previous request completes")
+        
+        loader.completeCommentsLoad(at: 0)
+        sut.simulateManualReload()
         XCTAssertEqual(loader.commentsLoadCount, 2, "On manual refresh the comments are loaded again")
         
+        loader.completeCommentsLoad(at: 1)
         sut.simulateManualReload()
         XCTAssertEqual(loader.commentsLoadCount, 3, "On another manual refresh the comments are loaded again")
     }
@@ -242,6 +247,7 @@ final class CommentsUIIntegrationTests: XCTestCase {
         
         func completeCommentsLoad(with items: [ImageComment] = [], at index: Int = 0) {
             commentsPublishers[index].send(items)
+            commentsPublishers[index].send(completion: .finished)
         }
         
         func completeCommentsLoadWithError(at index: Int = 0) {

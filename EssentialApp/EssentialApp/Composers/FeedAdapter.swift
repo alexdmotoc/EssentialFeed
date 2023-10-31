@@ -17,19 +17,30 @@ final class FeedAdapter: ResourceView {
     private weak var controller: ListViewController?
     private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
     private let selection: (FeedItem) -> Void
+    private let cachedFeedControllers: [FeedItem: CellController]
     
     init(
         controller: ListViewController,
+        cachedFeedControllers: [FeedItem: CellController] = [:],
         imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher,
         selection: @escaping (FeedItem) -> Void
     ) {
         self.controller = controller
         self.imageLoader = imageLoader
         self.selection = selection
+        self.cachedFeedControllers = cachedFeedControllers
     }
     
     func display(_ viewModel: Paginated<FeedItem>) {
+        guard let controller else { return }
+        
+        var cachedFeedControllers = cachedFeedControllers
+        
         let feedSection: [CellController] = viewModel.items.map { model in
+            if let controller = cachedFeedControllers[model] {
+                return controller
+            }
+            
             let adapter = FeedItemPresentationAdapter(loader: { [imageLoader] in
                 imageLoader(model.imageURL)
             })
@@ -45,34 +56,42 @@ final class FeedAdapter: ResourceView {
                 loadingView: WeakRefVirtualProxy(view),
                 resourceView: WeakRefVirtualProxy(view),
                 errorView: WeakRefVirtualProxy(view),
-                mapper: Data.tryMap
+                mapper: UIImage.tryMake
             )
-            return CellController(id: model, dataSource: view)
+            let controller = CellController(id: model, dataSource: view)
+            cachedFeedControllers[model] = controller
+            return controller
         }
         
         guard let loadMorePublisher = viewModel.loadMorePublisher() else {
-            controller?.display(feedSection)
+            controller.display(feedSection)
             return
         }
         
         let loadMoreAdapter = LoadMorePresentationAdapter(loader: { loadMorePublisher } )
         let loadMore = LoadMoreCellController(callback: loadMoreAdapter.load)
+        let loadMoreResourceView = FeedAdapter(
+            controller: controller,
+            cachedFeedControllers: cachedFeedControllers,
+            imageLoader: imageLoader,
+            selection: selection
+        )
         
         loadMoreAdapter.presenter = ResourcePresenter(
             loadingView: WeakRefVirtualProxy(loadMore),
-            resourceView: self,
+            resourceView: loadMoreResourceView,
             errorView: WeakRefVirtualProxy(loadMore)
         )
         
         let loadMoreSection = [CellController(id: UUID(), dataSource: loadMore)]
-        controller?.display(feedSection, loadMoreSection)
+        controller.display(feedSection, loadMoreSection)
     }
 }
 
-private extension Data {
+private extension UIImage {
     struct ImageDataMappingError: Error {}
     
-    static func tryMap(_ data: Data) throws -> UIImage {
+    static func tryMake(_ data: Data) throws -> UIImage {
         guard let image = UIImage(data: data) else {
             throw ImageDataMappingError()
         }

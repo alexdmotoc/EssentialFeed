@@ -32,24 +32,30 @@ extension FeedUIIntegrationTests {
         
         func completeFeedLoad(withFeed feed: [FeedItem] = [], at index: Int = 0) {
             feedPublishers[index].send(Paginated(items: feed, loadMorePublisher: { [weak self] in
-                let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
-                self?.loadMorePublishers.append(subject)
-                return subject.eraseToAnyPublisher()
+                self?.loadMorePublisher() ?? Empty().eraseToAnyPublisher()
             }))
+            feedPublishers[index].send(completion: .finished)
         }
         
         func completeFeedLoadWithError(at index: Int = 0) {
             feedPublishers[index].send(completion: .failure(NSError(domain: "mock", code: 0)))
         }
         
+        // MARK: - Load more
+        
+        func loadMorePublisher() -> AnyPublisher<Paginated<FeedItem>, Error> {
+            let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
+            loadMorePublishers.append(subject)
+            return subject.eraseToAnyPublisher()
+        }
+        
         func completeLoadMore(with feed: [FeedItem] = [], lastPage: Bool = false, at index: Int = 0) {
             loadMorePublishers[index].send(
                 Paginated(items: feed, loadMorePublisher: lastPage ? nil : { [weak self] in
-                    let subject = PassthroughSubject<Paginated<FeedItem>, Error>()
-                    self?.loadMorePublishers.append(subject)
-                    return subject.eraseToAnyPublisher()
+                    self?.loadMorePublisher() ?? Empty().eraseToAnyPublisher()
                 })
             )
+            loadMorePublishers[index].send(completion: .finished)
         }
         
         func completeLoadMoreWithError(at index: Int = 0) {
