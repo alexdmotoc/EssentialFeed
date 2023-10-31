@@ -539,6 +539,11 @@ final class FeedUIIntegrationTests: XCTestCase {
         sut.simulateCellIsNotVisible(at: 0)
         sut.simulateCellIsVisible(at: 0)
         XCTAssertEqual(loader.loadedImages, [image.imageURL, image.imageURL, image.imageURL], "Expected third request when visible after canceling previous complete")
+        
+        sut.simulateFeedLoadMoreAction()
+        loader.completeLoadMore(with: [image, makeImage()])
+        sut.simulateCellIsVisible(at: 0)
+        XCTAssertEqual(loader.loadedImages, [image.imageURL, image.imageURL, image.imageURL], "Expected no request until previous completes")
     }
     
     func test_feedImageView_configuresViewCorrectlyWhenTransitioningFromNearVisibleToVisibleWhileStillPreloadingImage() {
