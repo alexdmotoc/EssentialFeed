@@ -85,7 +85,7 @@ final class FeedAcceptanceTests: XCTestCase {
     
     private func launch(client: HTTPClientStub, store: InMemoryFeedStore) -> ListViewController {
         let scene = SceneDelegate(httpClient: client, store: store)
-        scene.window = UIWindow()
+        scene.window = UIWindow(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
         scene.configureWindow()
         let nav = scene.window?.rootViewController as? UINavigationController
         let feed = nav?.topViewController as! ListViewController
