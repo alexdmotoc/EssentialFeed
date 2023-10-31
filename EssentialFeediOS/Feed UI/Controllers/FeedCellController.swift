@@ -44,6 +44,8 @@ extension FeedCellController: UITableViewDataSource, UITableViewDelegate, UITabl
         cell?.locationLabel.text = viewModel.location
         cell?.locationContainer.isHidden = viewModel.location == nil
         cell?.feedImageView.image = nil
+        cell?.retryButton.isHidden = true
+        cell?.feedImageContainer.startShimmering()
         cell?.onRetry = { [weak self] in self?.delegate.didRequestImage() }
         cell?.onPrepareForReuse = { [weak self] in self?.releaseCellReference() }
         return cell!

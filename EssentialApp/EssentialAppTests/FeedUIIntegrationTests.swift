@@ -40,8 +40,13 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(loader.feedLoadCount, 1, "On first appearance the feed is loaded once")
         
         sut.simulateManualReload()
+        XCTAssertEqual(loader.feedLoadCount, 1, "On manual refresh the feed is NOT loaded again until previous request completes")
+        
+        loader.completeFeedLoad(at: 0)
+        sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 2, "On manual refresh the feed is loaded again")
         
+        loader.completeFeedLoad(at: 1)
         sut.simulateManualReload()
         XCTAssertEqual(loader.feedLoadCount, 3, "On another manual refresh the feed is loaded again")
     }
@@ -515,6 +520,27 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(loader.feedLoadMoreCount, 2)
     }
     
+    func test_feedImageView_doesNotLoadImageAgainUntilPreviousRequestCompletes() {
+        let image = makeImage(url: URL(string: "http://url-0.com")!)
+        let (sut, loader) = makeSUT()
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [image])
+        
+        sut.simulateCellPreload(at: 0)
+        XCTAssertEqual(loader.loadedImages, [image.imageURL], "Expected first request when near visible")
+        
+        sut.simulateCellIsVisible(at: 0)
+        XCTAssertEqual(loader.loadedImages, [image.imageURL], "Expected no request until previous completes")
+        
+        loader.completeImageLoad(at: 0)
+        sut.simulateCellIsVisible(at: 0)
+        XCTAssertEqual(loader.loadedImages, [image.imageURL, image.imageURL], "Expected second request when visible after previous complete")
+        
+        sut.simulateCellIsNotVisible(at: 0)
+        sut.simulateCellIsVisible(at: 0)
+        XCTAssertEqual(loader.loadedImages, [image.imageURL, image.imageURL, image.imageURL], "Expected third request when visible after canceling previous complete")
+    }
+    
     func test_feedImageView_configuresViewCorrectlyWhenTransitioningFromNearVisibleToVisibleWhileStillPreloadingImage() {
         let (sut, loader) = makeSUT()
         
@@ -529,7 +555,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(view0.isShowingLoadingIndicator, true, "Expected loading indicator when view becomes visible while still preloading image")
         
         let imageData = UIImage.make(withColor: .red).pngData()!
-        loader.completeImageLoad(withData: imageData, at: 1)
+        loader.completeImageLoad(withData: imageData, at: 0)
         
         XCTAssertEqual(view0.renderedImageData, imageData, "Expected rendered image after image preloads successfully")
         XCTAssertEqual(view0.isRetryButtonHidden, true, "Expected no retry action after image preloads successfully")
