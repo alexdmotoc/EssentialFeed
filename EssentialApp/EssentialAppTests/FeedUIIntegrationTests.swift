@@ -515,6 +515,27 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(loader.feedLoadMoreCount, 2)
     }
     
+    func test_feedImageView_configuresViewCorrectlyWhenTransitioningFromNearVisibleToVisibleWhileStillPreloadingImage() {
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()])
+        
+        sut.simulateCellPreload(at: 0)
+        let view0 = sut.simulateCellIsVisible(at: 0)
+                
+        XCTAssertEqual(view0.renderedImageData, nil, "Expected no rendered image when view becomes visible while still preloading image")
+        XCTAssertEqual(view0.isRetryButtonHidden, true, "Expected no retry action when view becomes visible while still preloading image")
+        XCTAssertEqual(view0.isShowingLoadingIndicator, true, "Expected loading indicator when view becomes visible while still preloading image")
+        
+        let imageData = UIImage.make(withColor: .red).pngData()!
+        loader.completeImageLoad(withData: imageData, at: 1)
+        
+        XCTAssertEqual(view0.renderedImageData, imageData, "Expected rendered image after image preloads successfully")
+        XCTAssertEqual(view0.isRetryButtonHidden, true, "Expected no retry action after image preloads successfully")
+        XCTAssertEqual(view0.isShowingLoadingIndicator, false, "Expected no loading indicator after image preloads successfully")
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {

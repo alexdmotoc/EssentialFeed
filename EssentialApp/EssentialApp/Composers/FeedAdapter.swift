@@ -45,7 +45,7 @@ final class FeedAdapter: ResourceView {
                 loadingView: WeakRefVirtualProxy(view),
                 resourceView: WeakRefVirtualProxy(view),
                 errorView: WeakRefVirtualProxy(view),
-                mapper: Data.tryMap
+                mapper: UIImage.tryMake
             )
             return CellController(id: model, dataSource: view)
         }
@@ -69,10 +69,10 @@ final class FeedAdapter: ResourceView {
     }
 }
 
-private extension Data {
+private extension UIImage {
     struct ImageDataMappingError: Error {}
     
-    static func tryMap(_ data: Data) throws -> UIImage {
+    static func tryMake(_ data: Data) throws -> UIImage {
         guard let image = UIImage(data: data) else {
             throw ImageDataMappingError()
         }
