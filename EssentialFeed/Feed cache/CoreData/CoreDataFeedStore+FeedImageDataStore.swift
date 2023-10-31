@@ -29,6 +29,7 @@ extension CoreDataFeedStore: FeedImageDataStore {
 
 private extension FeedItemMO {
     static func data(with url: URL, in context: NSManagedObjectContext) throws -> Data? {
+        if let data = context.userInfo[url] as? Data { return data }
         return try first(with: url, in: context)?.imageData
     }
     
@@ -38,5 +39,13 @@ private extension FeedItemMO {
         request.returnsObjectsAsFaults = false
         request.fetchLimit = 1
         return try context.fetch(request).first
+    }
+}
+
+extension FeedItemMO {
+    public override func prepareForDeletion() {
+        super.prepareForDeletion()
+        guard let imageURL else { return }
+        managedObjectContext?.userInfo[imageURL] = imageData
     }
 }

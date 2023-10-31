@@ -34,8 +34,11 @@ extension CoreDataFeedStore: FeedStore {
                     managedObject.itemDescription = $0.description
                     managedObject.location = $0.location
                     managedObject.imageURL = $0.url
+                    managedObject.imageData = context.userInfo[$0.url] as? Data
                     return managedObject
                 }
+                
+                context.userInfo.removeAllObjects()
                 
                 let cache = FeedCacheMO(context: context)
                 feedMO.forEach { cache.addToFeed($0) }
