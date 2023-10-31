@@ -21,13 +21,17 @@ extension CoreDataFeedStore: FeedImageDataStore {
     public func retrieve(dataForURL url: URL, completion: @escaping (FeedImageDataStore.RetrievalResult) -> Void) {
         perform { context in
             completion(Result {
-                try FeedItemMO.first(with: url, in: context)?.imageData
+                try FeedItemMO.data(with: url, in: context)
             })
         }
     }
 }
 
 private extension FeedItemMO {
+    static func data(with url: URL, in context: NSManagedObjectContext) throws -> Data? {
+        return try first(with: url, in: context)?.imageData
+    }
+    
     static func first(with url: URL, in context: NSManagedObjectContext) throws -> FeedItemMO? {
         let request = FeedItemMO.fetchRequest()
         request.predicate = NSPredicate(format: "%K = %@", argumentArray: [#keyPath(FeedItemMO.imageURL), url])
