@@ -42,18 +42,6 @@ final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
         })
     }
     
-    func test_save_doesNotCompleteAfterItWasDeallocated() {
-        let store = FeedImageDataStoreSpy()
-        var sut: LocalFeedImageDataLoader? = LocalFeedImageDataLoader(store: store)
-        
-        var receivedResults: [LocalFeedImageDataLoader.SaveResult] = []
-        sut?.save(anyData(), for: anyURL()) { receivedResults.append($0) }
-        sut = nil
-        store.completeInsertionSuccessfully()
-        
-        XCTAssertTrue(receivedResults.isEmpty)
-    }
-    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: LocalFeedImageDataLoader, store: FeedImageDataStoreSpy) {
@@ -76,6 +64,7 @@ final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
         line: UInt = #line
     ) {
         let exp = expectation(description: "wait for save")
+        action()
         sut.save(anyData(), for: anyURL()) { receivedResult in
             switch (expectedResult, receivedResult) {
             case (.success, .success):
@@ -89,7 +78,6 @@ final class LocalFeedImageDataLoaderTests_Save: XCTestCase {
             }
             exp.fulfill()
         }
-        action()
         wait(for: [exp], timeout: 1)
     }
 }
