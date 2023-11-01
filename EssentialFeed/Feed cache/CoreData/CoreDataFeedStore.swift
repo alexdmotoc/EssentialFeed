@@ -37,6 +37,13 @@ public final class CoreDataFeedStore {
         context.perform { action(context) }
     }
     
+    func performSync<R>(_ action: (NSManagedObjectContext) -> Result<R, Error>) throws -> R {
+        let result = context.performAndWait { [context] in
+            action(context)
+        }
+        return try result.get()
+    }
+    
     private func cleanUpReferencesToPersistentStores() {
         context.performAndWait {
             let coordinator = self.container.persistentStoreCoordinator
