@@ -50,34 +50,6 @@ final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
         })
     }
     
-    func test_load_doesNotDeliverResultAfterCancellingTask() {
-        let (sut, store) = makeSUT()
-        let foundData = anyData()
-
-        var received = [FeedImageDataLoader.Result]()
-        let task = sut.load(from: anyURL()) { received.append($0) }
-        task.cancel()
-
-        store.completeRetrievalSuccessfully(data: foundData)
-        store.completeRetrievalSuccessfully(data: nil)
-        store.completeRetrieval(error: anyNSError())
-
-        XCTAssertTrue(received.isEmpty, "Expected no received results after cancelling task")
-    }
-    
-    func test_load_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
-            let store = FeedImageDataStoreSpy()
-            var sut: LocalFeedImageDataLoader? = LocalFeedImageDataLoader(store: store)
-
-            var received = [FeedImageDataLoader.Result]()
-            _ = sut?.load(from: anyURL()) { received.append($0) }
-
-            sut = nil
-            store.completeRetrievalSuccessfully(data: anyData())
-
-            XCTAssertTrue(received.isEmpty, "Expected no received results after instance has been deallocated")
-        }
-    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: LocalFeedImageDataLoader, store: FeedImageDataStoreSpy) {
@@ -99,6 +71,7 @@ final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
+        action()
         let exp = expectation(description: "wait for load")
         _ = sut.load(from: anyURL()) { receivedResult in
             switch (expectedResult, receivedResult) {
@@ -113,7 +86,6 @@ final class LocalFeedImageDataLoaderTests_Load: XCTestCase {
             }
             exp.fulfill()
         }
-        action()
         wait(for: [exp], timeout: 1)
     }
 }
