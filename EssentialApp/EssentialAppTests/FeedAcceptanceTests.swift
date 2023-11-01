@@ -84,7 +84,7 @@ final class FeedAcceptanceTests: XCTestCase {
     // MARK: - Helpers
     
     private func launch(client: HTTPClientStub, store: InMemoryFeedStore) -> ListViewController {
-        let scene = SceneDelegate(httpClient: client, store: store)
+        let scene = SceneDelegate(httpClient: client, store: store, coreDataQueue: .immediateOnMainQueue)
         scene.window = UIWindow(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
         scene.configureWindow()
         let nav = scene.window?.rootViewController as? UINavigationController
@@ -105,7 +105,7 @@ final class FeedAcceptanceTests: XCTestCase {
     }
     
     private func enterBackground(with store: InMemoryFeedStore) {
-        let sut = SceneDelegate(httpClient: HTTPClientStub.offline, store: store)
+        let sut = SceneDelegate(httpClient: HTTPClientStub.offline, store: store, coreDataQueue: .immediateOnMainQueue)
         sut.sceneWillResignActive(UIApplication.shared.connectedScenes.first!)
     }
     

@@ -52,16 +52,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private lazy var logger = Logger(subsystem: "com.alexdmotoc.EssentialFeed", category: "main")
     
-    private lazy var coreDataQueue: some Scheduler = DispatchQueue(
+    private lazy var coreDataQueue: AnyDispatchQueueScheduler = DispatchQueue(
         label: "com.alexdmotoc.coreDataQueue",
         qos: .userInitiated,
         attributes: .concurrent
-    )
+    ).eraseToAnyScheduler()
     
-    convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
+    convenience init(
+        httpClient: HTTPClient,
+        store: FeedStore & FeedImageDataStore,
+        coreDataQueue: AnyDispatchQueueScheduler
+    ) {
         self.init()
         self.httpClient = httpClient
         self.store = store
+        self.coreDataQueue = coreDataQueue
     }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
