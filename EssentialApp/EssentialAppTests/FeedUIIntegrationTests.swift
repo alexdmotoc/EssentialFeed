@@ -581,7 +581,7 @@ final class FeedUIIntegrationTests: XCTestCase {
         let loader = LoaderSpy()
         let sut = FeedUIComposer.makeFeedController(
             with: loader.loadPublisher,
-            imageLoader: loader.loadPublisher,
+            imageLoader: loader.imageLoadPublisher,
             selection: selection
         )
         checkIsDeallocated(sut: loader, file: file, line: line)

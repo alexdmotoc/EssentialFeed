@@ -168,30 +168,20 @@ class EssentialFeedCacheIntegrationTests: XCTestCase {
     }
     
     private func save(_ data: Data, for url: URL, with loader: LocalFeedImageDataLoader, file: StaticString = #file, line: UInt = #line) {
-        let saveExp = expectation(description: "Wait for save completion")
-        loader.save(data, for: url) { result in
-            if case let Result.failure(error) = result {
-                XCTFail("Expected to save image data successfully, got error: \(error)", file: file, line: line)
-            }
-            saveExp.fulfill()
+        do {
+            try loader.save(data, for: url)
+        } catch {
+            XCTFail("Expected to save image data successfully, got error: \(error)", file: file, line: line)
         }
-        wait(for: [saveExp], timeout: 1.0)
     }
     
     private func expect(_ sut: LocalFeedImageDataLoader, toLoad expectedData: Data, for url: URL, file: StaticString = #file, line: UInt = #line) {
-        let exp = expectation(description: "Wait for load completion")
-        _ = sut.load(from: url) { result in
-            switch result {
-            case let .success(loadedData):
-                XCTAssertEqual(loadedData, expectedData, file: file, line: line)
-                
-            case let .failure(error):
-                XCTFail("Expected successful image data result, got \(error) instead", file: file, line: line)
-            }
-            
-            exp.fulfill()
+        do {
+            let loadedData = try sut.load(from: url)
+            XCTAssertEqual(loadedData, expectedData, file: file, line: line)
+        } catch {
+            XCTFail("Expected successful image data result, got \(error) instead", file: file, line: line)
         }
-        wait(for: [exp], timeout: 1.0)
     }
     
     private func setupEmptyStoreState() {
@@ -213,5 +203,4 @@ class EssentialFeedCacheIntegrationTests: XCTestCase {
     private func cachesDirectory() -> URL {
         return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
     }
-
 }
