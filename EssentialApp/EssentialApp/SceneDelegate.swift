@@ -52,6 +52,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private lazy var logger = Logger(subsystem: "com.alexdmotoc.EssentialFeed", category: "main")
     
+    private lazy var coreDataQueue: some Scheduler = DispatchQueue(
+        label: "com.alexdmotoc.coreDataQueue",
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
+    
     convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
         self.init()
         self.httpClient = httpClient
@@ -138,6 +144,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     .getPublisher(at: url)
                     .tryMap(FeedImageDataMapper.map)
                     .caching(to: localFeedImageLoader, for: url)
+                    .subscribe(on: coreDataQueue)
+                    .eraseToAnyPublisher()
             })
+            .subscribe(on: coreDataQueue)
+            .eraseToAnyPublisher()
     }
 }
