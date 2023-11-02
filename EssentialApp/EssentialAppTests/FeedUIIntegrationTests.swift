@@ -567,6 +567,22 @@ final class FeedUIIntegrationTests: XCTestCase {
         XCTAssertEqual(view0.isShowingLoadingIndicator, false, "Expected no loading indicator after image preloads successfully")
     }
     
+    func test_feedImageView_displaysCorrectlyWhenPreviousCellIsReused() {
+        let (sut, loader) = makeSUT()
+        sut.simulateAppearance()
+        loader.completeFeedLoad(withFeed: [makeImage()])
+        
+        sut.simulateCellIsVisible(at: 0)
+        let previousView = sut.simulateCellIsNotVisible(at: 0)
+        let newView = sut.simulateCellIsVisible(at: 0)
+        previousView.prepareForReuse()
+        
+        let imageData = UIImage.make(withColor: .red).pngData()!
+        loader.completeImageLoad(withData: imageData, at: 1)
+        
+        XCTAssertEqual(newView.renderedImageData, imageData)
+    }
+    
     // MARK: - Helpers
     
     private struct DummyView: ResourceView {
