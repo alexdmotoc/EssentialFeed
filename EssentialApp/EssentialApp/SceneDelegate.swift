@@ -111,6 +111,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .eraseToAnyPublisher()
     }
     
+    /// This is an exercise to demonstrate how we can load first from cache and then load from remote (unused)
+//    private func makeLocalFeedLoaderWithRemoteContinuation() -> AnyPublisher<Paginated<FeedItem>, Error> {
+//        let cachePublisher = localFeedLoader
+//            .loadPublisher()
+//            .map { self.makePage(items: $0, last: nil) }
+//        
+//        let remotePublisher = makeRemoteFeedLoaderWithLocalFallback()
+//            .delay(for: 10, scheduler: DispatchQueue.main)
+//        
+//        let combinedPublisher = cachePublisher
+//            .append(remotePublisher)
+//            .eraseToAnyPublisher()
+//        
+//        return combinedPublisher
+//    }
+    
     private func makeRemoteFeedLoaderWithLocalFallback() -> AnyPublisher<Paginated<FeedItem>, Error> {
         makeRemoteFeedLoader()
             .caching(to: localFeedLoader)
