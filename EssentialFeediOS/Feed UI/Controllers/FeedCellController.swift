@@ -82,6 +82,7 @@ extension FeedCellController: UITableViewDataSource, UITableViewDelegate, UITabl
     }
     
     private func releaseCellReference() {
+        cell?.onPrepareForReuse = nil
         cell = nil
     }
     

@@ -8,23 +8,21 @@
 import Foundation
 
 extension CoreDataFeedStore: FeedStore {
-    public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        perform { context in
-            let request = FeedCacheMO.fetchRequest()
-            do {
+    
+    public func deleteCachedFeed() throws {
+        try performSync { context in
+            Result {
+                let request = FeedCacheMO.fetchRequest()
                 let results = try context.fetch(request)
                 for item in results { context.delete(item) }
                 try context.save()
-                completion(nil)
-            } catch {
-                completion(error)
             }
         }
     }
     
-    public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        perform { context in
-            do {
+    public func insert(_ feed: [LocalFeedImage], timestamp: Date) throws {
+        try performSync { context in
+            Result {
                 let existingCache = try context.fetch(FeedCacheMO.fetchRequest())
                 for item in existingCache { context.delete(item) }
                 
@@ -44,20 +42,17 @@ extension CoreDataFeedStore: FeedStore {
                 feedMO.forEach { cache.addToFeed($0) }
                 cache.timestamp = timestamp
                 try context.save()
-                completion(nil)
-            } catch {
-                completion(error)
             }
         }
     }
     
-    public func retrieve(completion: @escaping RetrievalCompletion) {
-        perform { context in
-            completion(Result {
+    public func retrieve() throws -> CachedFeed? {
+        try performSync { context in
+            Result {
                 try context.fetch(FeedCacheMO.fetchRequest()).first.map {
                     ($0.localFeed, $0.timestamp!)
                 }
-            })
+            }
         }
     }
 }

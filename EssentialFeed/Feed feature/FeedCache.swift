@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol FeedCache {
-    func save(_ feed: [FeedItem], completion: @escaping (Error?) -> Void)
+    func save(_ feed: [FeedItem]) throws
 }

@@ -17,57 +17,34 @@ public class LocalFeedImageDataLoader {
 }
 
 extension LocalFeedImageDataLoader: FeedImageDataCache {
-    public typealias SaveResult = Result<Void, Error>
-    
     public enum SaveError: Error {
         case failed
     }
     
-    public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
-        store.insert(data, for: url) { [weak self] result in
-            guard self != nil else { return }
-            
-            completion(result.mapError { _ in SaveError.failed })
+    public func save(_ data: Data, for url: URL) throws {
+        do {
+            try store.insert(data, for: url)
+        } catch {
+            throw SaveError.failed
         }
     }
 }
 
 extension LocalFeedImageDataLoader: FeedImageDataLoader {
     
-    public typealias LoadResult = FeedImageDataLoader.Result
-    
     public enum LoadError: Error {
         case failed
         case notFound
     }
     
-    private class LoadImageDataTask: FeedImageDataLoaderTask {
-        private var completion: ((LoadResult) -> Void)?
-        
-        init(completion: @escaping (LoadResult) -> Void) {
-            self.completion = completion
+    public func load(from url: URL) throws -> Data {
+        do {
+            if let data = try store.retrieve(dataForURL: url) {
+                return data
+            }
+        } catch {
+            throw LoadError.failed
         }
-        
-        func complete(with result: LoadResult) {
-            completion?(result)
-        }
-        
-        func cancel() {
-            completion = nil
-        }
-    }
-    
-    public func load(from url: URL, completion: @escaping (LoadResult) -> Void) -> FeedImageDataLoaderTask {
-        let task = LoadImageDataTask(completion: completion)
-        store.retrieve(dataForURL: url) { [weak self] result in
-            guard self != nil else { return }
-            task.complete(with: result
-                .mapError { _ in LoadError.failed }
-                .flatMap { data in
-                    data.map { .success($0) } ?? .failure(LoadError.notFound)
-                }
-            )
-        }
-        return task
+        throw LoadError.notFound
     }
 }

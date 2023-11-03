@@ -52,10 +52,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private lazy var logger = Logger(subsystem: "com.alexdmotoc.EssentialFeed", category: "main")
     
-    convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
+    private lazy var coreDataQueue: AnyDispatchQueueScheduler = DispatchQueue(
+        label: "com.alexdmotoc.coreDataQueue",
+        qos: .userInitiated,
+        attributes: .concurrent
+    ).eraseToAnyScheduler()
+    
+    convenience init(
+        httpClient: HTTPClient,
+        store: FeedStore & FeedImageDataStore,
+        coreDataQueue: AnyDispatchQueueScheduler
+    ) {
         self.init()
         self.httpClient = httpClient
         self.store = store
+        self.coreDataQueue = coreDataQueue
     }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -72,7 +83,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
-        localFeedLoader.validateCache { _ in }
+        try? localFeedLoader.validateCache()
     }
     
     // MARK: - Navigation
@@ -100,11 +111,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .eraseToAnyPublisher()
     }
     
+    /// This is an exercise to demonstrate how we can load first from cache and then load from remote (unused)
+//    private func makeLocalFeedLoaderWithRemoteContinuation() -> AnyPublisher<Paginated<FeedItem>, Error> {
+//        let cachePublisher = localFeedLoader
+//            .loadPublisher()
+//            .map { self.makePage(items: $0, last: nil) }
+//        
+//        let remotePublisher = makeRemoteFeedLoaderWithLocalFallback()
+//            .delay(for: 10, scheduler: DispatchQueue.main)
+//        
+//        let combinedPublisher = cachePublisher
+//            .append(remotePublisher)
+//            .eraseToAnyPublisher()
+//        
+//        return combinedPublisher
+//    }
+    
     private func makeRemoteFeedLoaderWithLocalFallback() -> AnyPublisher<Paginated<FeedItem>, Error> {
         makeRemoteFeedLoader()
             .caching(to: localFeedLoader)
             .fallback(to: localFeedLoader.loadPublisher)
             .map(makeFirstPage)
+            .subscribe(on: coreDataQueue)
             .eraseToAnyPublisher()
     }
     
@@ -117,6 +145,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             .map(makePage)
             .caching(to: localFeedLoader)
+            .subscribe(on: coreDataQueue)
             .eraseToAnyPublisher()
     }
     
@@ -138,6 +167,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     .getPublisher(at: url)
                     .tryMap(FeedImageDataMapper.map)
                     .caching(to: localFeedImageLoader, for: url)
+                    .subscribe(on: coreDataQueue)
+                    .eraseToAnyPublisher()
             })
+            .subscribe(on: coreDataQueue)
+            .eraseToAnyPublisher()
     }
 }
